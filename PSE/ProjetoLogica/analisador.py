@@ -72,7 +72,13 @@ def parseMT(spec_input, nome=None):
     return parse(spec_input, tipo='MT', nome=nome)
 
 def parseAP(spec_input, nome=None):
-    return parse(spec_input, tipo='AP', nome=nome)
+    dictRetorno = parse(spec_input, tipo='AP', nome=nome)
+    submaquinas = list()
+    for submaqNome in dictRetorno['sub-maquinas']:
+        submaq = parseAF(spec_input, nome=submaqNome)
+        submaquinas.append(submaq)
+    dictRetorno['sub-maquinas'] = submaquinas
+    return dictRetorno
 
 def parseAF(spec_input, nome=None):
     return parse(spec_input, tipo='AF', nome=nome)
