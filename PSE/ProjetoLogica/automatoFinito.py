@@ -43,7 +43,7 @@ class AutomatoFinito(MaquinaBase):
                 index = self._estados.index(estIni)
                 self._estados[index][simbLido] = next(filter(lambda estado: estado == proxEst, self._estados))
 
-        self._cadeiaInicial = kwargs['cadeia']
+        self._cadeiaInicial = kwargs['cadeia'] if 'cadeia' in kwargs else None
 
         self._estadoAtual = None
         self._simboloAtual = None
