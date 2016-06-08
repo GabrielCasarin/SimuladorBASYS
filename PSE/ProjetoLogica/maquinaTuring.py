@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import datetime
-from PSE.ProjetoBase.maquina import MaquinaBase
+from PSE.ProjetoBase.maquinaBase import MaquinaBase
 from PSE.ProjetoLogica.fita import Fita
 from PSE.ProjetoLogica.estado import Estado
 

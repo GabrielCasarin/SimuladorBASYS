@@ -3,7 +3,7 @@
 u"""Simulador Estocástico dirigido por Eventos."""
 import datetime
 from PSE.ProjetoBase.lista import ListaPrioritaria
-from PSE.ProjetoBase.maquina import MaquinaBase
+from PSE.ProjetoBase.maquinaBase import MaquinaBase
 
 
 class Simulador(object):
