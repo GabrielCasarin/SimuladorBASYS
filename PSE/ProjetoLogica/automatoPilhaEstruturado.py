@@ -21,12 +21,24 @@ class AutomatoPilhaEstruturado(MaquinaBase):
         if 'nomeMaquina' in kwargs and kwargs['nomeMaquina'] is not None:
             self._nome = kwargs['nomeMaquina']
 
+        # sub-maquinas
         if 'sub-maquinas' in kwargs and kwargs['sub-maquinas'] is not None:
             self._subMaquinasDict = dict()
             for subMaqDict in kwargs['sub-maquinas']:
                 subMaq = AutomatoFinito(fita=self._fita, **subMaqDict)
                 self._subMaquinasDict[subMaq._nome] = subMaq
         print(self._subMaquinasDict)
+
+        # transicoes
+        if 'transicoes' in kwargs and kwargs['transicoes'] is not None:
+            self._chamadaSubMaq = dict()
+            for group in kwargs['transicoes']:
+                nomeSubMaq, estadoChamada = group[:2]
+                proxSubMaq = group[3]
+                estadoRetorno = group[4]
+                submaqtransition = Estado(nomeSubMaq)
+                submaqtransition[estadoChamada] = (proxSubMaq, estadoRetorno)
+                self._chamadaSubMaq[nomeSubMaq] = submaqtransition
 
         self._cadeiaInicial = kwargs['cadeia']
 
@@ -45,39 +57,39 @@ class AutomatoPilhaEstruturado(MaquinaBase):
         """atualiza o símbolo atual e dá outras providências."""
         # lê  o próximo símbolo da fita e atualiza
         simboloAtual = self._fita.ler()
-        self._submaquinaAtual._configuracao['simboloAtual'] = simboloAtual
+        self._submaquinaAtual._simboloAtual = simboloAtual
 
         # tenta fazer uma transição dentro da sub-máquina atual
         houveTransicao = self._submaquinaAtual.fazerTransicao()
 
         # determina próximo passo da execução
         if houveTransicao:
-                self._simulator.addTask('<CabecoteParaDireita>', 1, datetime.timedelta(seconds=1))
+            self._simulator.addTask('<CabecoteParaDireita>', 1, datetime.timedelta(seconds=1))
 
         else:
-                    tagMaqAtual = self._subMaquinasDictRev[self._submaquinaAtual]
-                    estadoAtual = self._submaquinaAtual._configuracao['estadoAtual']
+            tagMaqAtual = self._subMaquinasDictRev[self._submaquinaAtual]
+            estadoAtual = self._submaquinaAtual._configuracao['estadoAtual']
 
-                    # verifica se foi há uma chamada possível entre sub-máquinas
-                    if (tagMaqAtual, estadoAtual) in self._regrasTransicoes:
-                        self._simulator.addTask('<ChamadaSubmaquina>', 1, datetime.timedelta(seconds=1))
-                    # caso não fôra possível fazer uma transição desde a sub-máquina atual, analisa as ações passíveis de serem tomadas
-                    else:
-                        # se a sub-máquina atual estiver em um estado final,
-                        if self._submaquinaAtual._configuracao['estadoAtual'] in self._submaquinaAtual._estadosFinais:
-                            #  1) se a cadeia foi consumida por completo, resta saber se a pilha também o fôra
-                            if simboloAtual == '#':
-                                    if len(self._pilha) == 0:
-                                        #  A pilha está vazia => não há retorno a realizar
-                                        self._simulator.addTask('<AtingiuEstadoFinal>', 0, datetime.timedelta())
-                                    else:
-                                        self._simulator.addTask('<Erro>', 0, datetime.timedelta())
-                            #   2) se se está em estado final e resta cadeia para analisar, retorna para sub-máquina anterior
+            # verifica se foi há uma chamada possível entre sub-máquinas
+            if (tagMaqAtual, estadoAtual) in self._regrasTransicoes:
+                self._simulator.addTask('<ChamadaSubmaquina>', 1, datetime.timedelta(seconds=1))
+            # caso não fôra possível fazer uma transição desde a sub-máquina atual, analisa as ações passíveis de serem tomadas
+            else:
+                # se a sub-máquina atual estiver em um estado final,
+                if self._submaquinaAtual._configuracao['estadoAtual'] in self._submaquinaAtual._estadosFinais:
+                    #  1) se a cadeia foi consumida por completo, resta saber se a pilha também o fôra
+                    if simboloAtual == '#':
+                            if len(self._pilha) == 0:
+                                #  A pilha está vazia => não há retorno a realizar
+                                self._simulator.addTask('<AtingiuEstadoFinal>', 0, datetime.timedelta())
                             else:
-                                self._simulator.addTask('<RetornoSubmaquina>', 1, datetime.timedelta(seconds=1))
-                        # se não houve transição e não se chegou a um estado final, logo não houve reconhecimento da cadeia
-                        else:
-                            self._simulator.addTask('<Erro>', 0, datetime.timedelta())
+                                self._simulator.addTask('<Erro>', 0, datetime.timedelta())
+                    #   2) se se está em estado final e resta cadeia para analisar, retorna para sub-máquina anterior
+                    else:
+                        self._simulator.addTask('<RetornoSubmaquina>', 1, datetime.timedelta(seconds=1))
+                # se não houve transição e não se chegou a um estado final, logo não houve reconhecimento da cadeia
+                else:
+                    self._simulator.addTask('<Erro>', 0, datetime.timedelta())
 
 
     def CabecoteParaDireita(self):
