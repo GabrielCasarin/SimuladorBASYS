@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import datetime
-from PSE.ProjetoBase.maquinaBase import MaquinaBase
-from PSE.ProjetoLogica.fita import Fita
-from PSE.ProjetoLogica.estado import Estado
+from PSE.Base.maquina import MaquinaBase
+from PSE.Logica.fita import Fita
+from PSE.Logica.estado import Estado
 
 
 class MaquinaTuring(MaquinaBase):

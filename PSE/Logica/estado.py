@@ -15,8 +15,8 @@ class Estado(object):
     def isFinal(self):
         return self._final
 
-    def __setitem__(self, symbol, next):
-        self._transicoes[symbol] = next
+    def __setitem__(self, symbol, prox):
+        self._transicoes[symbol] = prox
 
     def __getitem__(self, symbol):
     	return self._transicoes[symbol]

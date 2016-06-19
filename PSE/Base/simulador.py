@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 u"""Simulador Estocástico dirigido por Eventos."""
 import datetime
-from PSE.ProjetoBase.lista import ListaPrioritaria
-from PSE.ProjetoBase.maquinaBase import MaquinaBase
+from PSE.Base.lista import ListaPrioritaria
+from PSE.Base.maquina import MaquinaBase
 
 
 class Simulador(object):
