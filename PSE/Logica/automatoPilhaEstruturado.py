@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from PSE.ProjetoBase.maquina import MaquinaBase
-from PSE.ProjetoLogica.fita import Fita
-from PSE.ProjetoLogica.estado import Estado
-from PSE.ProjetoLogica.automatoFinito import AutomatoFinito
+from PSE.Base.maquina import MaquinaBase
+from PSE.Logica.fita import Fita
+from PSE.Logica.estado import Estado
+from PSE.Logica.automatoFinito import AutomatoFinito
 
 
 class AutomatoPilhaEstruturado(MaquinaBase):
