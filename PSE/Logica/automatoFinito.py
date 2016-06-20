@@ -40,17 +40,10 @@ class AutomatoFinito(MaquinaBase):
             for group in kwargs['transicoes']:
                 estIni, simbLido = group[:2]
                 proxEst = group[3]
-<<<<<<< HEAD
-                index = self._estados.index(estIni)
-                self._estados[index][simbLido] = next(filter(lambda estado: estado == proxEst, self._estados))
-
-        self._cadeiaInicial = kwargs['cadeia']
-=======
                 index = self._estados.index(estIni)  # procura o estado estIni dentro da lista de estados
                 self._estados[index][simbLido] = next(filter(lambda estado: estado == proxEst, self._estados))
 
         self._cadeiaInicial = kwargs['cadeia'] if 'cadeia' in kwargs else None
->>>>>>> AutomatoPilha
 
         self._estadoAtual = None
         self._simboloAtual = None
