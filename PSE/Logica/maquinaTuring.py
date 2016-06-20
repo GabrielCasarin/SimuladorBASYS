@@ -66,21 +66,32 @@ class MaquinaTuring(MaquinaBase):
         self._simboloAtual = self._fita.ler()
         houveTransicao = self.fazerTransicao()
 
+        if houveTransicao:
+            self._simulator.addTask('<GravacaoSimbolo>', 1, datetime.timedelta(seconds=1))
+        else:
+            if self._estadoAtual.isFinal() and self._simboloAtual == '#':
+                self._simulator.addTask('<AtingiuEstadoH>', 0, datetime.timedelta(seconds=1))
+            else:
+                self._simulator.addTask('<Erro>', 0, datetime.timedelta(seconds=1))
+
 
     def GravacaoSimbolo(self):
         # grava o simbolo que esta no buffer na memoria da fita
         self._fita.gravar(self._bufferSimboloEscrita)
         self._bufferSimboloEscrita = None
         # movimenta o cursor dependendo da movimentacao programada
-        if self._proxMovimento == '>':
+        if self._proxMovimento == 'D':
             self._simulator.addTask('<CabecoteParaDireita>', 1, datetime.timedelta(seconds=1))
 
-        elif self._proxMovimento == '<':
+        elif self._proxMovimento == 'E':
             self._simulator.addTask('<CabecoteParaEsquerda>', 1, datetime.timedelta(seconds=1))
 
         # caso o movimento programado nao seja nem para direita nem para esquerda
         else:
-            self._simulator.addTask('<Erro>', 0, datetime.timedelta(seconds=1))
+            if self._estadoAtual == "H": # se o estado atual for o estado HALT
+                self._simulator.addTask('<AtingiuEstadoH>', 0, datetime.timedelta(seconds=1))
+            else: # caso se trate de um erro mesmo
+                self._simulator.addTask('<Erro>', 0, datetime.timedelta(seconds=1))
         self._proxMovimento = None
 
 
@@ -90,8 +101,11 @@ class MaquinaTuring(MaquinaBase):
 
 
     def CabecoteParaEsquerda(self):
-        self._fita.recuar()
-        self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
+        try:
+            self._fita.recuar()
+            self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
+        except Exception as e:
+            self._simulator.addTask('<Bloqueio>', 0, datetime.timedelta(seconds=1))
 
 
     def AtingiuEstadoH(self):
@@ -107,14 +121,14 @@ class MaquinaTuring(MaquinaBase):
 
 
     def fazerTransicao(self):
-        if self._simboloAtual != '#':   # se não se consumiu todos os caracteres
-            if self._simboloAtual in self._estadoAtual:
-                nomeProxEst, simbDeEscrita, movimento = self._estadoAtual[self._simboloAtual]
-                proxEst = next(filter(lambda estado : estado == nomeProxEst, self._estados))
-                self._estadoAtual = proxEst
-                self._bufferSimboloEscrita = simbDeEscrita
-                self._proxMovimento = movimento
-                return True
+        # se existe uma transicao associada ao estado atual
+        if self._simboloAtual in self._estadoAtual:
+            nomeProxEst, simbDeEscrita, movimento = self._estadoAtual[self._simboloAtual]
+            proxEst = next(filter(lambda estado : estado == nomeProxEst, self._estados))
+            self._estadoAtual = proxEst
+            self._bufferSimboloEscrita = simbDeEscrita
+            self._proxMovimento = movimento
+            return True
         return False
 
 
@@ -128,3 +142,7 @@ class MaquinaTuring(MaquinaBase):
         '<Bloqueio>': Bloqueio,
         '<Erro>': Erro,
     }
+
+
+    def printEvent(self, task):
+        print("{task}: {estado} {simbolo}".format(task=task, estado=self._estadoAtual, simbolo=self._simboloAtual))

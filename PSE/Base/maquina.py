@@ -15,7 +15,7 @@ class MaquinaBase(object):
         """set a reference of the Simulator caller for the Maquina instance.
         @param simulator: uma referência para o simulador associado à máquina
         @type simulator: Simulador"""
-        from PSE.ProjetoBase.simulador import Simulador
+        from PSE.Base.simulador import Simulador
         if isinstance(simulator, Simulador):
             self._simulator = simulator
 
