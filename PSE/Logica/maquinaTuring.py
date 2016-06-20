@@ -52,7 +52,8 @@ class MaquinaTuring(MaquinaBase):
 
         self._estadoAtual = None
         self._simboloAtual = None
-
+        self._bufferSimboloEscrita = None
+        self._proxMovimento = None
 
 
     def PartidaInicial(self):
@@ -60,27 +61,44 @@ class MaquinaTuring(MaquinaBase):
         self._fita.iniciar(self._cadeiaInicial)
         self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
 
+
     def LeituraSimbolo(self):
         self._simboloAtual = self._fita.ler()
         houveTransicao = self.fazerTransicao()
 
 
     def GravacaoSimbolo(self):
-        pass
+        # grava o simbolo que esta no buffer na memoria da fita
+        self._fita.gravar(self._bufferSimboloEscrita)
+        # movimenta o cursor dependendo da movimentacao programada
+        if self._proxMovimento == '>':
+            self._simulator.addTask('<CabecoteParaDireita>', 1, datetime.timedelta(seconds=1))
+
+        elif self._proxMovimento == '<':
+            self._simulator.addTask('<CabecoteParaEsquerda>', 1, datetime.timedelta(seconds=1))
+            
+        # caso o movimento programado nao seja nem para direita nem para esquerda
+        else:
+            self._simulator.addTask('<Erro>', 0, datetime.timedelta(seconds=1))
+
 
     def CabecoteParaDireita(self):
         self._fita.avancar()
         self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
 
+
     def CabecoteParaEsquerda(self):
         self._fita.recuar()
         self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
 
+
     def AtingiuEstadoH(self):
         pass
 
+
     def Bloqueio(self):
         pass
+
 
     def Erro(self):
         pass
@@ -88,6 +106,7 @@ class MaquinaTuring(MaquinaBase):
 
     def fazerTransicao(self):
         pass
+
 
     Eventos = {
         '<PartidaInicial>': PartidaInicial,
