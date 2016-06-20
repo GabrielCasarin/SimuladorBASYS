@@ -21,7 +21,9 @@ class Fita:
         return self._cadeia[self._cursor]
 
     def gravar(self, simbolo):
-        if 0 <= len(simbolo) <= 1:
+        if len(simbolo) == 1:
+            if self._cadeia[self._cursor] == '#' and self._cursor == len(self._cadeia)-1:
+                self._cadeia.append('#')
             self._cadeia[self._cursor] = simbolo
 
     def avancar(self):
@@ -30,13 +32,15 @@ class Fita:
                 self._cursor += 1
         else:
             if self._cursor >= len(self._cadeia)-1:
-                self._cadeia.append(' ')
+                self._cadeia.append('#')
             self._cursor += 1
 
     def recuar(self):
         if self._cursor > 0:
             self._cursor -= 1
+        else:
+            raise Exception('Recuo aquem da fita')
 
     def __str__(self, cursor=True):
         i = self._cursorUltimoSimboloLido if not cursor else self._cursor
-        return ''.join(self._cadeia[:i]) + self._cadeia[i] + u'\u0333' + ''.join(self._cadeia[i+1: self._max_length])
+        return ''.join(self._cadeia[:i]) + self._cadeia[i] + ''.join(self._cadeia[i+1: self._max_length])
