@@ -44,9 +44,9 @@ class MaquinaTuring(MaquinaBase):
             for group in kwargs['transicoes']:
                 estIni, simbLido = group[:2]
                 proxEst = group[3]
-                simbEscrito, mov = group[5:7]
+                simbDeEscrita, mov = group[5:7]
                 index = self._estados.index(estIni)
-                self._estados[index][simbLido] = (proxEst, simbEscrito, mov)
+                self._estados[index][simbLido] = (proxEst, simbDeEscrita, mov)
 
         self._cadeiaInicial = kwargs['cadeia']
 
@@ -70,16 +70,18 @@ class MaquinaTuring(MaquinaBase):
     def GravacaoSimbolo(self):
         # grava o simbolo que esta no buffer na memoria da fita
         self._fita.gravar(self._bufferSimboloEscrita)
+        self._bufferSimboloEscrita = None
         # movimenta o cursor dependendo da movimentacao programada
         if self._proxMovimento == '>':
             self._simulator.addTask('<CabecoteParaDireita>', 1, datetime.timedelta(seconds=1))
 
         elif self._proxMovimento == '<':
             self._simulator.addTask('<CabecoteParaEsquerda>', 1, datetime.timedelta(seconds=1))
-            
+
         # caso o movimento programado nao seja nem para direita nem para esquerda
         else:
             self._simulator.addTask('<Erro>', 0, datetime.timedelta(seconds=1))
+        self._proxMovimento = None
 
 
     def CabecoteParaDireita(self):
@@ -105,7 +107,15 @@ class MaquinaTuring(MaquinaBase):
 
 
     def fazerTransicao(self):
-        pass
+        if self._simboloAtual != '#':   # se não se consumiu todos os caracteres
+            if self._simboloAtual in self._estadoAtual:
+                nomeProxEst, simbDeEscrita, movimento = self._estadoAtual[self._simboloAtual]
+                proxEst = next(filter(lambda estado : estado == nomeProxEst, self._estados))
+                self._estadoAtual = proxEst
+                self._bufferSimboloEscrita = simbDeEscrita
+                self._proxMovimento = movimento
+                return True
+        return False
 
 
     Eventos = {
