@@ -10,11 +10,11 @@ class Fita:
         self._max_length = max_length
         self.iniciar(cadeiaInicial)
 
-    def iniciar(self, cadeiaInicial):
+    def iniciar(self, cadeiaInicial, comecarDoComeco=True):
         # '#' simboliza o final da cadeia de entrada
         self._cadeia = list(cadeiaInicial)[0:self._max_length] + ['#']
-        self._cursor = 0
-        self._cursorUltimoSimboloLido = 0
+        self._cursor = 0 if comecarDoComeco else len(cadeiaInicial)
+        self._cursorUltimoSimboloLido = self._cursor
 
     def ler(self):
         self._cursorUltimoSimboloLido = self._cursor
