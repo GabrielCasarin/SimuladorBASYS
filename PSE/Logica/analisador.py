@@ -37,7 +37,7 @@ def parse(spec_input, tipo=None, nome=None):
             # analisa transições
             if re.search('transicoes|d|δ', nomeConjunto) is not None:
                 dictRetorno['transicoes'] = []
-                regraIterator = re.finditer('\((?P<el1>\w+),\s*(?P<el2>.*?)\s*\)\s*->\s*(?:(?P<par>\()?(?P<el3>\w+)(?:/(?P<el4>\w+)|\s*,\s*(?P<el5>[#\w+])\s*,\s*(?P<el6>[DE]))?(?(par)\)))\s*(?:,|$)', elementos, re.DOTALL)
+                regraIterator = re.finditer('\((?P<el1>\w+),\s*(?P<el2>.*?)\s*\)\s*->\s*(?:(?P<par>\()?(?P<el3>\w+)(?:/(?P<el4>\w+)|\s*,\s*(?P<el5>[<>#\w+])\s*)?(?(par)\)))\s*(?:,|$)', elementos, re.DOTALL)
                 for regra in regraIterator:
                     dictRetorno['transicoes'].append(regra.groups())
             # analisa alfabeto de fita

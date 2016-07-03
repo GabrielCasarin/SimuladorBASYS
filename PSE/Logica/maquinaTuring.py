@@ -44,9 +44,9 @@ class MaquinaTuring(MaquinaBase):
             for group in kwargs['transicoes']:
                 estIni, simbLido = group[:2]
                 proxEst = group[3]
-                simbDeEscrita, mov = group[5:7]
+                acao = group[5]
                 index = self._estados.index(estIni)
-                self._estados[index][simbLido] = (proxEst, simbDeEscrita, mov)
+                self._estados[index][simbLido] = (proxEst, acao)
 
         self._cadeiaInicial = kwargs['cadeia']
 
