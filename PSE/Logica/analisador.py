@@ -20,7 +20,7 @@ def parse(spec_input, tipo=None, nome=None):
     dictRetorno.setdefault('alfabetoGama', None)
     dictRetorno.setdefault('transicoes', None)
     dictRetorno.setdefault('sub-maquinas', None)
-    dictRetorno.setdefault('estadoIncial', None)
+    dictRetorno.setdefault('estadoInicial', None)
     dictRetorno.setdefault('estadosFinais', None)
     dictRetorno.setdefault('nomeMaquina', None)
     # dictRetorno.setdefault('', None)
@@ -61,7 +61,7 @@ def parse(spec_input, tipo=None, nome=None):
                 for subm in re.finditer('<(?P<nomeMaquina>\w+)>\s*(?:,|$)', elementos):
                     dictRetorno['sub-maquinas'].append(subm.group('nomeMaquina'))
             elif nomeConjunto == 'I':
-                dictRetorno['estadoIncial'] = re.split(',', elementos.replace(' ', ''))[0]
+                dictRetorno['estadoInicial'] = re.split(',', elementos.replace(' ', ''))[0]
             elif nomeConjunto == 'F':
                 dictRetorno['estadosFinais'] = re.split(',', elementos.replace(' ', ''))
 

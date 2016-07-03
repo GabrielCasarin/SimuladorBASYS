@@ -27,7 +27,6 @@ class AutomatoPilhaEstruturado(MaquinaBase):
             for subMaqDict in kwargs['sub-maquinas']:
                 subMaq = AutomatoFinito(fita=self._fita, **subMaqDict)
                 self._subMaquinasDict[subMaq._nome] = subMaq
-        print(self._subMaquinasDict)
 
         # transicoes
         if 'transicoes' in kwargs and kwargs['transicoes'] is not None:
@@ -40,17 +39,19 @@ class AutomatoPilhaEstruturado(MaquinaBase):
                 submaqtransition[estadoChamada] = (proxSubMaq, estadoRetorno)
                 self._chamadaSubMaq[nomeSubMaq] = submaqtransition
 
+        # sub-maquina inicial
+        if 'estadoInicial' in kwargs and kwargs['estadoInicial'] is not None:
+            self._submaquinaInicial = kwargs['estadoInicial'][1:-1]
+
         self._cadeiaInicial = kwargs['cadeia']
+
+        self._pilha = list()
 
     def PartidaInicial(self):
         """põe o Automato de Pilha Estruturado no estado inicial e dá outras providências."""
-        self._pilha = list()
-
         self._submaquinaAtual = self._subMaquinasDict[self._submaquinaInicial]
-
-        self._estadoAtual = self._estadoInicial
+        # self._estadoAtual = self._estadoInicial
         self._fita.iniciar(self._cadeiaInicial)
-
         self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
 
     def LeituraSimbolo(self):
@@ -145,5 +146,12 @@ class AutomatoPilhaEstruturado(MaquinaBase):
 
     def printEvent(self, taskType):
         estadoAtual, simboloAtual = self._submaquinaAtual.getConfiguracao()
-        print( "({estado}, {cadeia}, {topo}) :".format(estado=estadoAtual, cadeia=simboloAtual, topo=self._subMaquinasDictRev[self._submaquinaAtual]), taskType)
+        print( "({estado}, {cadeia}, {topo}) :".format(estado=estadoAtual, cadeia=simboloAtual, topo=self._submaquinaAtual._nome), taskType)
         print(self._pilha)
+
+
+    def __eq__(self, maq):
+    	if isinstance(maq, AutomatoPilhaEstruturado):
+    		return self == name._nome
+    	else:
+    		return self._nome == maq

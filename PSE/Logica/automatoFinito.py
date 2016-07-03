@@ -23,8 +23,8 @@ class AutomatoFinito(MaquinaBase):
         if 'estados' in kwargs and kwargs['estados'] is not None:
             self._estados = [Estado(nomeEstado) for nomeEstado in kwargs['estados']]
 
-        if 'estadoIncial' in kwargs and kwargs['estadoIncial'] is not None:
-            self._estadoInicial = next(filter(lambda estado: estado == kwargs['estadoIncial'], self._estados))
+        if 'estadoInicial' in kwargs and kwargs['estadoInicial'] is not None:
+            self._estadoInicial = next(filter(lambda estado: estado == kwargs['estadoInicial'], self._estados))
 
         if 'estadosFinais' in kwargs and kwargs['estadosFinais'] is not None:
             for nomeEstado in kwargs['estadosFinais']:
@@ -117,3 +117,9 @@ class AutomatoFinito(MaquinaBase):
 
     def getConfiguracao(self):
         return self._estadoAtual, self._simboloAtual
+
+    def __eq__(self, maq):
+    	if isinstance(maq, AutomatoFinito):
+    		return self == name._nome
+    	else:
+    		return self._nome == maq
