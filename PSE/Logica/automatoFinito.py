@@ -53,7 +53,7 @@ class AutomatoFinito(MaquinaBase):
 
     def PartidaInicial(self):
         u"""põe o Automato Finito no Estado Inicial e da outras providências."""
-        self._estadoAtual = self._estadoInicial
+        self.inicializar()
         self._fita.iniciar(self._cadeiaInicial)
         self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
 
@@ -89,6 +89,10 @@ class AutomatoFinito(MaquinaBase):
     def FimSimulacao(self):
         pass
 
+
+    def inicializar(self):
+        self._estadoAtual = self._estadoInicial
+        self._simboloAtual = None
 
     def fazerTransicao(self):
         if self._simboloAtual != '#':   # se não se consumiu todos os caracteres

@@ -50,7 +50,7 @@ class AutomatoPilhaEstruturado(MaquinaBase):
     def PartidaInicial(self):
         """põe o Automato de Pilha Estruturado no estado inicial e dá outras providências."""
         self._submaquinaAtual = self._subMaquinasDict[self._submaquinaInicial]
-        # self._estadoAtual = self._estadoInicial
+        self._submaquinaAtual.inicializar()
         self._fita.iniciar(self._cadeiaInicial)
         self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
 
@@ -66,21 +66,27 @@ class AutomatoPilhaEstruturado(MaquinaBase):
         # determina próximo passo da execução
         if houveTransicao:
             self._simulator.addTask('<CabecoteParaDireita>', 1, datetime.timedelta(seconds=1))
-
+        # se está em estado final, vê se a pilha esta vazia ou não
+        # elif self._submaquinaAtual._estadoAtual.isFinal():
+        #     if self._pilha:
+        #         self._simulator.addTask('<RetornoSubmaquina>', 1, datetime.timedelta(seconds=1))
+        #     elif not self._pilha:
+        #         self._simulator.addTask('<AtingiuEstadoFinal>', 1, datetime.timedelta(seconds=1))
+        # tenta transitar
         else:
-            tagMaqAtual = self._subMaquinasDictRev[self._submaquinaAtual]
-            estadoAtual = self._submaquinaAtual._configuracao['estadoAtual']
+            tagMaqAtual = self._submaquinaAtual._nome
+            estadoAtual = self._submaquinaAtual._estadoAtual._nome
 
-            # verifica se foi há uma chamada possível entre sub-máquinas
-            if (tagMaqAtual, estadoAtual) in self._regrasTransicoes:
+            # verifica se há uma chamada possível entre sub-máquinas
+            if tagMaqAtual in self._chamadaSubMaq and estadoAtual in self._chamadaSubMaq[tagMaqAtual]:
                 self._simulator.addTask('<ChamadaSubmaquina>', 1, datetime.timedelta(seconds=1))
             # caso não fôra possível fazer uma transição desde a sub-máquina atual, analisa as ações passíveis de serem tomadas
             else:
                 # se a sub-máquina atual estiver em um estado final,
-                if self._submaquinaAtual._configuracao['estadoAtual'] in self._submaquinaAtual._estadosFinais:
+                if self._submaquinaAtual._estadoAtual.isFinal():
                     #  1) se a cadeia foi consumida por completo, resta saber se a pilha também o fôra
-                    if simboloAtual == '#':
-                            if len(self._pilha) == 0:
+                    if self._submaquinaAtual._simboloAtual == '#':
+                            if not self._pilha:
                                 #  A pilha está vazia => não há retorno a realizar
                                 self._simulator.addTask('<AtingiuEstadoFinal>', 0, datetime.timedelta())
                             else:
@@ -103,24 +109,24 @@ class AutomatoPilhaEstruturado(MaquinaBase):
         self._simulator.addTask('<FimSimulacao>', 0, datetime.timedelta())
 
     def ChamadaSubmaquina(self):
-        tagMaqAtual = self._subMaquinasDictRev[self._submaquinaAtual]
-        estadoAtual = self._submaquinaAtual._configuracao['estadoAtual']
+        tagMaqAtual = self._submaquinaAtual._nome
+        estadoAtual = self._submaquinaAtual._estadoAtual._nome
 
         # Pega a próxima sub-máquina e o estado de retorno
-        proxMaquina, estadoRetorno = self._regrasTransicoes[(tagMaqAtual, estadoAtual)]
+        proxMaquina, estadoRetorno = self._chamadaSubMaq[tagMaqAtual][estadoAtual]
         # Empilha a sub-máquina de retorno e o estado de retorno
         self._pilha.append((tagMaqAtual, estadoRetorno))
 
         self._submaquinaAtual = self._subMaquinasDict[proxMaquina]
-        self._submaquinaAtual.setConfiguracaoInicial()
+        self._submaquinaAtual.inicializar()
         self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
 
     def RetornoSubmaquina(self):
         if len(self._pilha) > 0:
             submaqRet, estadoRetorno = self._pilha.pop()
             self._submaquinaAtual = self._subMaquinasDict[submaqRet]
-            self._submaquinaAtual._configuracao['estadoAtual'] = estadoRetorno
-            self._submaquinaAtual._configuracao['simboloAtual'] = self._fita.ler()
+            self._submaquinaAtual._estadoAtual = next(filter(lambda estado: estado == estadoRetorno, self._submaquinaAtual._estados))
+            self._submaquinaAtual._simboloAtual = self._fita.ler()
             self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
         else:
             self._simulator.addTask('<Erro>', 0, datetime.timedelta())
@@ -144,11 +150,35 @@ class AutomatoPilhaEstruturado(MaquinaBase):
         '<FimSimulacao>': FimSimulacao
     }
 
+    def printPilha(self):
+        pilha = self._pilha
+        if pilha:
+            pilhaStrs = []
+            for el in pilha:
+                pilhaStrs.append(" {SubMaq}/{EstRet} |".format(SubMaq=el[0], EstRet=el[1]))
+
+            print('-', end='')
+            for elStr in pilhaStrs:
+                print('{0:-<{1}}'.format('', len(elStr)), end='')
+            print()
+            print('|', end='')
+            for elStr in pilhaStrs:
+                print(elStr, end='')
+            print()
+            print('-', end='')
+            for elStr in pilhaStrs:
+                print('{0:-<{1}}'.format('', len(elStr)), end='')
+            print()
+        else:
+            print('----')
+            print('|Z0|')
+            print('----')
+
+
     def printEvent(self, taskType):
         estadoAtual, simboloAtual = self._submaquinaAtual.getConfiguracao()
         print( "({estado}, {cadeia}, {topo}) :".format(estado=estadoAtual, cadeia=simboloAtual, topo=self._submaquinaAtual._nome), taskType)
-        print(self._pilha)
-
+        self.printPilha()
 
     def __eq__(self, maq):
     	if isinstance(maq, AutomatoPilhaEstruturado):
