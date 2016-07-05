@@ -92,6 +92,6 @@ ENV/
 # Rope project settings
 .ropeproject
 
-*.maquina
-main.py
-*.cadeia
+#*.maquina
+#main.py
+#*.cadeia
