@@ -130,6 +130,10 @@ class MaquinaTuring(MaquinaBase):
             return True
         return False
 
+    def fim(self, task):
+        if task == '<FimSimulacao>':
+            return True
+        return False
 
     Eventos = {
         '<PartidaInicial>': PartidaInicial,
@@ -144,4 +148,30 @@ class MaquinaTuring(MaquinaBase):
 
 
     def printEvent(self, task):
-        print("{task}: {alfa} {estado} {beta}".format(task=task, estado=self._estadoAtual, alfa=''.join(self._fita._cadeia[0:self._fita._cursor]), beta=''.join(self._fita._cadeia[self._fita._cursor:])))
+        if task == '<PartidaInicial>':
+            print("{task}: a Maquina iniciou no estado {est}".format(task=task, est=self._estadoInicial._nome))
+
+        if task == '<LeituraSimbolo>':
+            print("{task}: leu o simbolo '{simb}' da fita".format(task=task, simb=self._simboloAtual))
+
+        if task == '<GravacaoSimbolo>':
+            print("{task}: gravou o simbolo '{simb}' na fita".format(task=task, simb=self._fita.ler()))
+
+        if task == '<CabecoteParaDireita>':
+            print("{task}: movimentou o cursor da fita para DIReita".format(task=task))
+
+        if task == '<CabecoteParaEsquerda>':
+            print("{task}: movimentou o cursor da fita para ESQuerda".format(task=task))
+
+        if task == '<AtingiuEstadoH>':
+            print("{task}: ".format(task=task))
+
+        if task == '<Bloqueio>':
+            print("{task}: o cursor tentou recuar aquem do inicio da fita. Maquina BLOQUEADA".format(task=task))
+
+        if task == '<Erro>':
+            print("{task}: atingiu estado de erro.".format(task=task))
+            print("Resultado: cadeia {cad} REJEITADA".format(cad=self._cadeiaInicial))
+
+        print("Conf.: {alfa} {estado} {beta}".format(task=task, estado=self._estadoAtual, alfa=''.join(self._fita._cadeia[0:self._fita._cursor]), beta=''.join(self._fita._cadeia[self._fita._cursor:])))
+        print()

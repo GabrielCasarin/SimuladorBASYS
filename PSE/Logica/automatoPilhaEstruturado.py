@@ -152,6 +152,7 @@ class AutomatoPilhaEstruturado(MaquinaBase):
     def fim(self, task):
         if task == '<FimSimulacao>':
             return True
+        return False
 
     def printPilha(self):
         pilha = self._pilha

@@ -104,6 +104,11 @@ class AutomatoFinito(MaquinaBase):
         #    2) não havia regra associada ao par (estadoAtual, simboloAtual)
         return False
 
+    def fim(self, task):
+        if task == '<FimSimulacao>':
+            return True
+        return False
+
 
     Eventos = {
         '<PartidaInicial>': PartidaInicial,
