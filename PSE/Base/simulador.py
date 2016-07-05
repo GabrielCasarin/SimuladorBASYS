@@ -35,8 +35,8 @@ class Simulador(object):
 
         while len(self._listaEventos) > 0 and not chegouFimSimulacao:
             task, time = self.nextTask()
-            self._Maquina.trataEvento(task)
             self._agora = max(self._agora, time)
+            self._Maquina.trataEvento(task)
             chegouFimSimulacao = self._Maquina.fim(task)
             self._Maquina.printEvent(task)
 

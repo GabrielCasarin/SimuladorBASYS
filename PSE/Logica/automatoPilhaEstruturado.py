@@ -66,12 +66,6 @@ class AutomatoPilhaEstruturado(MaquinaBase):
         # determina próximo passo da execução
         if houveTransicao:
             self._simulator.addTask('<CabecoteParaDireita>', 1, datetime.timedelta(seconds=1))
-        # se está em estado final, vê se a pilha esta vazia ou não
-        # elif self._submaquinaAtual._estadoAtual.isFinal():
-        #     if self._pilha:
-        #         self._simulator.addTask('<RetornoSubmaquina>', 1, datetime.timedelta(seconds=1))
-        #     elif not self._pilha:
-        #         self._simulator.addTask('<AtingiuEstadoFinal>', 1, datetime.timedelta(seconds=1))
         # tenta transitar
         else:
             tagMaqAtual = self._submaquinaAtual._nome
@@ -88,25 +82,28 @@ class AutomatoPilhaEstruturado(MaquinaBase):
                     if self._submaquinaAtual._simboloAtual == '#':
                             if not self._pilha:
                                 #  A pilha está vazia => não há retorno a realizar
-                                self._simulator.addTask('<AtingiuEstadoFinal>', 0, datetime.timedelta())
+                                self._simulator.addTask('<AtingiuEstadoFinal>', 0, datetime.timedelta(seconds=1))
                             else:
-                                self._simulator.addTask('<Erro>', 0, datetime.timedelta())
+                                self._simulator.addTask('<Erro>', 0, datetime.timedelta(seconds=1))
                     #   2) se se está em estado final e resta cadeia para analisar, retorna para sub-máquina anterior
                     else:
                         self._simulator.addTask('<RetornoSubmaquina>', 1, datetime.timedelta(seconds=1))
                 # se não houve transição e não se chegou a um estado final, logo não houve reconhecimento da cadeia
                 else:
-                    self._simulator.addTask('<Erro>', 0, datetime.timedelta())
+                    self._simulator.addTask('<Erro>', 0, datetime.timedelta(seconds=1))
 
 
     def CabecoteParaDireita(self):
         """avança um caracter da fita"""
         self._fita.avancar()
-        self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
+        tagMaqAtual = self._submaquinaAtual._nome
+        estadoAtual = self._submaquinaAtual._estadoAtual._nome
+        # verifica se há uma chamada possível entre sub-máquinas
+        if tagMaqAtual in self._chamadaSubMaq and estadoAtual in self._chamadaSubMaq[tagMaqAtual]:
+            self._simulator.addTask('<ChamadaSubmaquina>', 1, datetime.timedelta(seconds=1))
+        else:
+            self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
 
-    def AtingiuEstadoFinal(self):
-        print("cadeia", self._cadeiaInicial, "aceita.")
-        self._simulator.addTask('<FimSimulacao>', 0, datetime.timedelta())
 
     def ChamadaSubmaquina(self):
         tagMaqAtual = self._submaquinaAtual._nome
@@ -129,11 +126,13 @@ class AutomatoPilhaEstruturado(MaquinaBase):
             self._submaquinaAtual._simboloAtual = self._fita.ler()
             self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
         else:
-            self._simulator.addTask('<Erro>', 0, datetime.timedelta())
+            self._simulator.addTask('<Erro>', 1, datetime.timedelta(seconds=1))
+
+    def AtingiuEstadoFinal(self):
+        self._simulator.addTask('<FimSimulacao>', 0, datetime.timedelta(seconds=1))
 
     def Erro(self):
-        print("cadeia", self._cadeiaInicial, "NAO foi aceita.")
-        self._simulator.addTask('<FimSimulacao>', 0, datetime.timedelta())
+        self._simulator.addTask('<FimSimulacao>', 0, datetime.timedelta(seconds=1))
 
     def FimSimulacao(self):
         pass
@@ -150,6 +149,10 @@ class AutomatoPilhaEstruturado(MaquinaBase):
         '<FimSimulacao>': FimSimulacao
     }
 
+    def fim(self, task):
+        if task == '<FimSimulacao>':
+            return True
+
     def printPilha(self):
         pilha = self._pilha
         if pilha:
@@ -157,28 +160,64 @@ class AutomatoPilhaEstruturado(MaquinaBase):
             for el in pilha:
                 pilhaStrs.append(" {SubMaq}/{EstRet} |".format(SubMaq=el[0], EstRet=el[1]))
 
-            print('-', end='')
+            print('\t-', end='')
             for elStr in pilhaStrs:
                 print('{0:-<{1}}'.format('', len(elStr)), end='')
             print()
-            print('|', end='')
+            print('\t|', end='')
             for elStr in pilhaStrs:
                 print(elStr, end='')
             print()
-            print('-', end='')
+            print('\t-', end='')
             for elStr in pilhaStrs:
                 print('{0:-<{1}}'.format('', len(elStr)), end='')
             print()
         else:
-            print('----')
-            print('|Z0|')
-            print('----')
+            print('\t----')
+            print('\t|Z0|')
+            print('\t----')
 
 
-    def printEvent(self, taskType):
+    def printEvent(self, task):
         estadoAtual, simboloAtual = self._submaquinaAtual.getConfiguracao()
-        print( "({estado}, {cadeia}, {topo}) :".format(estado=estadoAtual, cadeia=simboloAtual, topo=self._submaquinaAtual._nome), taskType)
-        self.printPilha()
+        # print( "({estado}, {cadeia}, {topo}) :".format(estado=estadoAtual, cadeia=simboloAtual, topo=self._submaquinaAtual._nome), taskType)
+
+        printarpilha = False
+
+        if task == '<PartidaInicial>':
+            print("\t{hora} {task}: Iniciou o Automato na maquina inicial <{maq}> no estado {est}".format(task=task, hora=self._simulator._agora, maq=self._submaquinaInicial, est=self._subMaquinasDict[self._submaquinaInicial]._estadoInicial._nome))
+            printarpilha = True
+
+        elif task == '<LeituraSimbolo>':
+            print("\t{hora} {task}: Leu o simbolo '{simb}'".format(task=task, hora=self._simulator._agora, simb=simboloAtual, est=estadoAtual, maq=self._submaquinaAtual._nome))
+
+        elif task == '<CabecoteParaDireita>':
+            print("\t{hora} {task}: Moveu o cursor da fita para direita".format(task=task, hora=self._simulator._agora))
+
+        elif task == '<AtingiuEstadoFinal>':
+            print("\t{hora} {task}: o Automato atingiu estado final {est}".format(task=task, hora=self._simulator._agora, est=estadoAtual))
+            print("\tResultado: cadeia {cad} ACEITA".format(cad=self._cadeiaInicial))
+
+        elif task == '<ChamadaSubmaquina>':
+            print("\t{hora} {task}: Entrou na sub-maquina <{maq}>".format(task=task, hora=self._simulator._agora, maq= self._submaquinaAtual._nome))
+            printarpilha = True
+
+        elif task == '<RetornoSubmaquina>':
+            print("\t{hora} {task}: voltou para a sub-maquina <{maq}>".format(task=task, hora=self._simulator._agora, maq= self._submaquinaAtual._nome))
+            printarpilha = True
+
+        elif task == '<Erro>':
+            print("\t{hora} {task}: erro durante execucao do reconhecimento".format(task=task, hora=self._simulator._agora))
+            print("\tResultado: cadeia {cad} NAO foi aceita".format(cad=self._cadeiaInicial))
+
+        elif task == '<FimSimulacao>':
+            print("\t{hora} {task}: simulacao atingiu o seu termino".format(task=task, hora=self._simulator._agora))
+
+        print("\tConf.: {alfa} {estado} {beta}".format(estado=estadoAtual, alfa=''.join(self._fita._cadeia[0:self._fita._cursor]), beta=''.join(self._fita._cadeia[self._fita._cursor:])))
+        if printarpilha:
+            print('\tPilha:')
+            self.printPilha()
+        print()
 
     def __eq__(self, maq):
     	if isinstance(maq, AutomatoPilhaEstruturado):
