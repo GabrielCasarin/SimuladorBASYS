@@ -68,10 +68,10 @@ class AutomatoFinito(MaquinaBase):
         else:  # se não houve transição, há quatro hipóteses possíveis
             # se a cadeia acabou e se se atigingiu um estado final
             if self._estadoAtual.isFinal() and self._simboloAtual == '#':
-                self._simulator.addTask('<AtingiuEstadoFinal>', 0, datetime.timedelta())
+                self._simulator.addTask('<AtingiuEstadoFinal>', 0, datetime.timedelta(seconds=1))
             # ou em qualquer outro caso
             else:
-                self._simulator.addTask('<Erro>', 0, datetime.timedelta())
+                self._simulator.addTask('<Erro>', 0, datetime.timedelta(seconds=1))
 
 
     def CabecoteParaDireita(self):
@@ -79,12 +79,10 @@ class AutomatoFinito(MaquinaBase):
         self._simulator.addTask('<LeituraSimbolo>', 1, datetime.timedelta(seconds=1))
 
     def AtingiuEstadoFinal(self):
-        print("cadeia", self._cadeiaInicial, "aceita.")
-        self._simulator.addTask('<FimSimulacao>', 0, datetime.timedelta())
+        self._simulator.addTask('<FimSimulacao>', 0, datetime.timedelta(seconds=1))
 
     def Erro(self):
-        print("cadeia", self._cadeiaInicial, "NAO foi aceita.")
-        self._simulator.addTask('<FimSimulacao>', 0, datetime.timedelta())
+        self._simulator.addTask('<FimSimulacao>', 0, datetime.timedelta(seconds=1))
 
     def FimSimulacao(self):
         pass
@@ -116,8 +114,32 @@ class AutomatoFinito(MaquinaBase):
         '<FimSimulacao>': FimSimulacao
     }
 
-    def printEvent(self, taskType):
-        print("({estado}, {cadeia}) :".format(estado=self._estadoAtual, cadeia=self._simboloAtual), taskType)
+    def printEvent(self, task):
+        # print("({estado}, {cadeia}) :".format(estado=self._estadoAtual, cadeia=self._simboloAtual), task)
+
+        if task == '<PartidaInicial>':
+            print(self._simulator._agora, "{task}: Iniciou o Automato no estado {est}".format(task=task, est= self._estadoAtual))
+
+        if task == '<LeituraSimbolo>':
+            print(self._simulator._agora, "{task}: Leu o simbolo {simb}".format(task=task, simb= self._simboloAtual))
+
+        if task == '<CabecoteParaDireita>':
+            print(self._simulator._agora, "{task}: moveu o cabecote para a direita".format(task=task))
+
+        if task == '<AtingiuEstadoFinal>':
+            print(self._simulator._agora, "{task}: atingiu estado final".format(task=task))
+            print('Resultado: cadeia {cad} ACEITA'.format(cad=self._cadeiaInicial))
+
+        if task == '<Erro>':
+            print(self._simulator._agora, "{task}: erro durante execucao".format(task=task))
+            print('Resultado: cadeia {cad} REJEITADA'.format(cad=self._cadeiaInicial))
+
+        if task == '<FimSimulacao>':
+            print(self._simulator._agora, "{task}: Termino da simulacao".format(task=task))
+
+
+        print("Conf.: {alfa} {estado} {beta}".format(task=task, estado=self._estadoAtual, alfa=''.join(self._fita._cadeia[0:self._fita._cursor]), beta=''.join(self._fita._cadeia[self._fita._cursor:])))
+        print()
 
     def getConfiguracao(self):
         return self._estadoAtual, self._simboloAtual
