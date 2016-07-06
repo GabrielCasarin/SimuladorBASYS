@@ -1,18 +1,16 @@
-AF <S> is
+AF <M1> is
 
-    Q = { q0, q1, E, F}
+    Q = { q0, q1, q2}
 
     E = {'a', 'b', 'c'}
 
     d = {
-          (q0, a) -> q1,  (q0, b) -> E,    (q0, c) -> F,
-          (q1, a) -> E,   (q1, b) -> q1,   (q1, c) -> F,
-          (E, a) -> E,    (E, b) -> E,     (E, c) -> E,
-          (F, a) -> E,    (F, b) -> E,     (F, c) -> F
+          (q0, a) -> q1,
+          (q1, b) -> q1, (q1, c) -> q2
         }
 
     I = { q0 }
 
-    F = { F }
+    F = { q2 }
 
-end <S>;
+end <M1>;

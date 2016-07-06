@@ -15,11 +15,11 @@ class Estado(object):
     def isFinal(self):
         return self._final
 
-    def __setitem__(self, symbol, prox):
-        self._transicoes[symbol] = prox
+    def __setitem__(self, simbol, prox):
+        self._transicoes[simbol] = prox
 
-    def __getitem__(self, symbol):
-    	return self._transicoes[symbol]
+    def __getitem__(self, simbol):
+    	return self._transicoes[simbol]
 
     def __eq__(self, estado):
     	if isinstance(estado, Estado):

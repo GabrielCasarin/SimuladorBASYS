@@ -35,9 +35,12 @@ class AutomatoPilhaEstruturado(MaquinaBase):
                 nomeSubMaq, estadoChamada = group[:2]
                 proxSubMaq = group[3]
                 estadoRetorno = group[4]
-                submaqtransition = Estado(nomeSubMaq)
+                if nomeSubMaq not in self._chamadaSubMaq:
+                    submaqtransition = Estado(nomeSubMaq)
+                    self._chamadaSubMaq[nomeSubMaq] = submaqtransition
+                else:
+                    submaqtransition = self._chamadaSubMaq[nomeSubMaq]
                 submaqtransition[estadoChamada] = (proxSubMaq, estadoRetorno)
-                self._chamadaSubMaq[nomeSubMaq] = submaqtransition
 
         # sub-maquina inicial
         if 'estadoInicial' in kwargs and kwargs['estadoInicial'] is not None:

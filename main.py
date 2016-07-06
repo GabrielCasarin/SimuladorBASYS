@@ -22,7 +22,6 @@ def main():
             #             for key_el in el:
             #                 print('\t', key_el, '<-->', el[key_el])
             maq = AutomatoPilhaEstruturado(**d, cadeia=cadeia)
-            # return maq
         elif tipo == 'AF':
             d = analisador.parseAF(input_file.read())
             maq = AutomatoFinito(**d, cadeia=cadeia)

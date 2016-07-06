@@ -10,10 +10,10 @@ AF <a1> is
     F = { q4 }
 end <a1>;
 
-AP <Pi> is
+AP <P1> is
     S = {<a1>}
     I = {<a1>}
     d = {
             (a1, q2) -> a1/q3
         }
-end <Pi>;
+end <P1>;

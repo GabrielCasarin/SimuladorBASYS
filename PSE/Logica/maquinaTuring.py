@@ -165,9 +165,11 @@ class MaquinaTuring(MaquinaBase):
 
         if task == '<AtingiuEstadoH>':
             print("{task}: ".format(task=task))
+            print("Resultado: cadeia {cad} ACEITA".format(cad=self._cadeiaInicial))
 
         if task == '<Bloqueio>':
             print("{task}: o cursor tentou recuar aquem do inicio da fita. Maquina BLOQUEADA".format(task=task))
+            print("Resultado: cadeia {cad} REJEITADA".format(cad=self._cadeiaInicial))
 
         if task == '<Erro>':
             print("{task}: atingiu estado de erro.".format(task=task))
