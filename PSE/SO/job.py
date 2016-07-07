@@ -1,24 +1,31 @@
 class Job(object):
     """docstring for Job"""
-    def __init__(self, Ti, Ttotal, tamMem, IOcount):
+    def __init__(self, nome, tChegada, tMaxCPU, tamMem, IOcount, printCount):
         super(Job, self).__init__()
 
-        if Ti >= 0:
-            self._Ti = Ti
-        else:
-            self._Ti = 0
+        self.nome = nome
 
-        if Ttotal >= 0:
-            self.Ttotal = Ttotal
+        if tChegada >= 0:
+            self.tChegada = tChegada
         else:
-            self._Ttotal = 0
+            self.tChegada = 0
+
+        if tMaxCPU >= 0:
+            self.tMaxCPU = tMaxCPU
+        else:
+            self.tMaxCPU = 0
 
         if tamMem >= 0:
             self.tamMem = tamMem
         else:
-            self._tamMem = 0
+            self.tamMem = 0
 
         if IOcount >= 0:
             self.IOcount = IOcount
         else:
-            self._IOcount = 0
+            self.IOcount = 0
+
+        if printCount >= 0:
+            self.printCount = printCount
+        else:
+            self.printCount = 0
