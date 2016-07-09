@@ -4,7 +4,7 @@ class Evento(object):
         super(Evento, self).__init__()
         self.tipo = tipo
         self.t_ocorrencia = t_ocorrencia
-        self.job = job
+        self.nome_job = job
 
     def tipo(self):
         return self.tipo

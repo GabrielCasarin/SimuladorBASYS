@@ -3,7 +3,8 @@ import random
 from math import floor, ceil
 
 from PSE.SO.job import Job
-from PSE.SO.maquina import Maquina
+from PSE.SO import Maquina
+from PSE.Base.simulador import Simulador
 
 
 with open('so1.txt') as fin:
@@ -27,3 +28,7 @@ with open('so1.txt') as fin:
       print(jobs[0].nome, jobs[0].tChegada, jobs[0].tMaxCPU, jobs[0].tamMem, jobs[0].IOcount)
 
   mac = Maquina(T_acionamento_clk, T_final, jobs)
+  sim = Simulador(mac)
+  for job in jobs:
+      eventoInicial = Evento
+      sim.addTask()
