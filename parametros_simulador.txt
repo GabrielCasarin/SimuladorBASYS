@@ -1,0 +1,7 @@
+time_slice_size = 10
+max_processos = 100
+disco_tempo_leitura = 50
+disco_tempo_escrita = 10
+disco_tamanho = 80
+memoria_tempo_transferencia = 40
+memoria_tamanho = 2000

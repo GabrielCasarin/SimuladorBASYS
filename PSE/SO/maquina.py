@@ -3,7 +3,7 @@ from PSE.SO import CPU, Disco, Evento, Impressora, Job, Leitora, Memoria, Mensag
 
 class Maquina(MaquinaBase):
     """docstring for Maquina"""
-    def __init__(self, T_acionamento_clk, T_final, jobs, T_relocacao_mem, tamanho_mem):
+    def __init__(self, T_acionamento_clk, T_final, jobs, time_slice_size, max_processos, disco_tempo_leitura, disco_tempo_escrita, disco_tamanho, memoria_tempo_relocacao, memoria_tempo_transferencia, memoria_tamanho):
         super(Maquina, self).__init__()
 
         self.simulador = None
@@ -20,22 +20,25 @@ class Maquina(MaquinaBase):
         else:
             self.T_final = 0
 
+        ## seta os valores das configuracoes globais
+        self.max_processos = max_processos
+
         ## dispositivos que a maquina deve conter
-        # self.cpu = cpu.CPU()
-        # self.disco = disco.Disco()
-        self.memoria = Memoria(T_relocacao_mem, tamanho_mem)
+        self.cpu = CPU(time_slice_size)
+        self.disco = disco.Disco(disco_tempo_leitura, disco_tempo_escrita, disco_tamanho)
+        self.memoria = Memoria(memoria_tempo_relocacao, memoria_tempo_transferencia, memoria_tamanho)
         # self.impressora1 = impressora.Impressora()
         # self.impressora2 = impressora.Impressora()
         # self.leitora1 = leitora.Leitora()
         # self.leitora2 = leitora.Leitora()
 
-        # tabela com todos os jobs a serem simulados
+        ## tabela com todos os jobs a serem simulados
         self.jobs_inativos = {
             job.nome: job for job in jobs
         }
-        # Job table
+        ## Job table
         self.job_table = list()
-        self.job_atual_ptr = 0
+        # self.job_atual_ptr = 0
 
     def trataEvento(self, evento):
         if evento.tipo() == '<Iniciar>':
@@ -107,8 +110,8 @@ class Maquina(MaquinaBase):
         except Mensagem as e:
             if e == 'job desempilhado':
                 pass
-            elif e == 'CPU livre':
-                pass
+            # elif e == 'CPU livre':
+            #     pass
 
     def LiberarMemoria(self, job):
         try:

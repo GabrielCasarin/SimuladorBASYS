@@ -3,7 +3,7 @@ from PSE.SO import Segmento, Mensagem
 
 
 class Memoria(object):
-    def __init__(self, T_relocacao, tamanho):
+    def __init__(self, T_relocacao, T_acesso, tamanho):
         super(Memoria, self).__init__()
         self.tamanho = tamanho
         self.mem_disponivel = tamanho

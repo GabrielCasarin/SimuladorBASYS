@@ -12,14 +12,17 @@ class Job(object):
         self.DiscoCount = DiscoCount
         self.LeitoraCount = LeitoraCount
         self.ImpressoraCount = ImpressoraCount
-
         self.eventos_programados = eventos_programados
+
+
+    def sinc(self, timeSlice):
+        self.tempoTranscorrido += timeSlice
+
+    def run(self):
+        pass
 
     def __eq__(self, job):
         if isinstance(job, Job):
             return self.nome == job.nome
         else:
             return self.nome == job
-
-    def sinc(self, timeSlice):
-        self.tempoTranscorrido += tempoTranscorrido

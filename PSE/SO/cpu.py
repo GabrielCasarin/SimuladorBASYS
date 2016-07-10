@@ -10,9 +10,9 @@ class CPU(object):
         self.fila = ListaPrioritaria()
         self.job_em_execucao = None
 
-    def reserva(self, job):
+    def reserva(self, job, prioridade, agora):
         if self.busy:
-            self.fila.push(job)
+            self.fila.push(job, prioridade, agora)
             # raise Mensagem('inserido na fila da CPU')
         else:
             self.job_em_execucao = job
@@ -23,5 +23,5 @@ class CPU(object):
         self.busy = False
         if len(self.fila) > 0:
             raise Mensagem('job desempilhado', self.fila.pop())
-        else:
-            raise Mensagem('CPU livre')
+        # else:
+        #     raise Mensagem('CPU livre')
