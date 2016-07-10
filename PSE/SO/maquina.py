@@ -3,7 +3,7 @@ from PSE.SO import CPU, Disco, Evento, Impressora, Job, Leitora, Memoria, Mensag
 
 class Maquina(MaquinaBase):
     """docstring for Maquina"""
-    def __init__(self, T_acionamento_clk, T_final, jobs, time_slice_size, max_processos, disco_tempo_leitura, disco_tempo_escrita, disco_tamanho, memoria_tempo_relocacao, memoria_tempo_transferencia, memoria_tamanho):
+    def __init__(self, T_acionamento_clk, T_final, time_slice_size, max_processos, disco_tempo_leitura, disco_tempo_escrita, disco_tamanho, memoria_tempo_relocacao, memoria_tempo_transferencia, memoria_tamanho, jobs):
         super(Maquina, self).__init__()
 
         self.simulador = None
@@ -25,12 +25,12 @@ class Maquina(MaquinaBase):
 
         ## dispositivos que a maquina deve conter
         self.cpu = CPU(time_slice_size)
-        self.disco = disco.Disco(disco_tempo_leitura, disco_tempo_escrita, disco_tamanho)
+        self.disco = Disco(disco_tempo_leitura, disco_tempo_escrita, disco_tamanho)
         self.memoria = Memoria(memoria_tempo_relocacao, memoria_tempo_transferencia, memoria_tamanho)
-        # self.impressora1 = impressora.Impressora()
-        # self.impressora2 = impressora.Impressora()
-        # self.leitora1 = leitora.Leitora()
-        # self.leitora2 = leitora.Leitora()
+        # self.impressora1 = Impressora()
+        # self.impressora2 = Impressora()
+        # self.leitora1 = Leitora()
+        # self.leitora2 = Leitora()
 
         ## tabela com todos os jobs a serem simulados
         self.jobs_inativos = {

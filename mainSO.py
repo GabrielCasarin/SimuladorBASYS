@@ -23,8 +23,10 @@ with open('parametros_simulador.txt') as conf_sim:
           memoria_tempo_transferencia = int(atributo[1])
         elif atributo[0] == 'memoria_tamanho':
           memoria_tamanho = int(atributo[1])
+        elif atributo[0] == 'memoria_tempo_relocacao':
+          memoria_tempo_relocacao = int(atributo[1])
 
- 
+
 # time_slice_size
 # max_processos
 # disco_tempo_leitura
@@ -34,10 +36,10 @@ with open('parametros_simulador.txt') as conf_sim:
 # memoria_tamanho
 
 
-# with open('so1.txt') as fin:
-#   linhas = fin.readlines()
-#   T_acionamento_clk = int(linhas[0])
-#   T_final = int(linhas[1])
+with open('so1.txt') as arq_jobs:
+  linhas = arq_jobs.readlines()
+  T_acionamento_clk = int(linhas[0])
+  T_final = int(linhas[1])
 #
 #   jobs = list()
 #
@@ -54,7 +56,7 @@ with open('parametros_simulador.txt') as conf_sim:
 #       print(times)
 #       print(jobs[0].nome, jobs[0].tChegada, jobs[0].tMaxCPU, jobs[0].tamMem, jobs[0].IOcount)
 #
-#   mac = Maquina(T_acionamento_clk, T_final, jobs)
+mac = Maquina(T_acionamento_clk, T_final, time_slice_size=time_slice_size, max_processos=max_processos, disco_tempo_leitura=disco_tempo_leitura, disco_tempo_escrita=disco_tempo_escrita, disco_tamanho=disco_tamanho, memoria_tempo_relocacao=memoria_tempo_relocacao, memoria_tempo_transferencia=memoria_tempo_transferencia, memoria_tamanho=memoria_tamanho, jobs=[])
 #   sim = Simulador(mac)
 #   for job in jobs:
 #       eventoInicial = Evento
