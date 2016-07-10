@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 u"""Simulador Estocástico dirigido por Eventos."""
-import datetime
+# import datetime
 from PSE.Base.lista import ListaPrioritaria
 from PSE.Base.maquinaBase import MaquinaBase
 
@@ -14,9 +14,10 @@ class Simulador(object):
         @param machine: uma instancia de uma máquina a ser simulada
         @type machine: Maquina"""
         self._listaEventos = ListaPrioritaria()
-        self._agora = datetime.timedelta()
+        # self._agora = datetime.timedelta()
+        self._agora = 0
 
-        if isinstance(machine, MaquinaBase	):
+        if isinstance(machine, MaquinaBase):
                 self._Maquina = machine
                 self._Maquina.setSimulator(self)
 

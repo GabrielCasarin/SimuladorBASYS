@@ -3,7 +3,7 @@ from PSE.SO import CPU, Disco, Evento, Impressora, Job, Leitora, Memoria, Mensag
 
 class Maquina(MaquinaBase):
     """docstring for Maquina"""
-    def __init__(self, T_acionamento_clk, T_final, time_slice_size, max_processos, disco_tempo_leitura, disco_tempo_escrita, disco_tamanho, memoria_tempo_relocacao, memoria_tempo_transferencia, memoria_tamanho, jobs):
+    def __init__(self, T_acionamento_clk, T_final, time_slice_size, max_processos, disco_tempo_leitura, disco_tempo_escrita, disco_tamanho, memoria_tempo_relocacao, memoria_tempo_transferencia, memoria_tamanho):#, jobs):
         super(Maquina, self).__init__()
 
         self.simulador = None
@@ -33,9 +33,11 @@ class Maquina(MaquinaBase):
         # self.leitora2 = Leitora()
 
         ## tabela com todos os jobs a serem simulados
-        self.jobs_inativos = {
-            job.nome: job for job in jobs
-        }
+        # self.jobs_inativos = {
+        #     job.nome: job for job in jobs
+        # }
+        # for job in jobs:
+        #     eventoChegadaJob = Evento('<Iniciar>', job.T_chegada, job)
         ## Job table
         self.job_table = list()
         # self.job_atual_ptr = 0
@@ -43,7 +45,8 @@ class Maquina(MaquinaBase):
     def trataEvento(self, evento):
         if evento.tipo() == '<Iniciar>':
             # pega o job que foi carregado durante o carregamento do arquivo de jobs
-            job = self.jobs_inativos[evento.nome_job]
+            # job = self.jobs_inativos[evento.nome_job]
+            job = evento.job
             # e chama a rotina de inicialização
             self.Iniciar(job)
 
@@ -70,9 +73,9 @@ class Maquina(MaquinaBase):
 
     def Iniciar(self, novo_job):
         # insere o job na tabela de jobs ativos
-        self.job_table[novo_job.nome] = novo_job
+        self.job_table.append(novo_job)
         # agenda uma requisição de memória
-        eventoRequisicaoMem = Evento('<RequisitarMemoria>', novo_job.tChegada, novo_job)
+        eventoRequisicaoMem = Evento('<RequisitarMemoria>', novo_job.T_chegada, novo_job)
         self.simulador.addTask(eventoRequisicaoMem, 1, eventoRequisicaoMem.t_ocorrencia)
 
 
@@ -131,5 +134,6 @@ class Maquina(MaquinaBase):
     def addSimulador(self, simulador):
         if isinstance(simulador, Simulador):
             self.simulador = simulador
+            self.simulador._agora = self.T_acionamento_clk
         else:
             self.simulador = None

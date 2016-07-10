@@ -37,7 +37,7 @@ class Memoria(object):
             if len(self.fila) > 0:
                 temp, _ = self.fila.pop()
                 raise Mensagem('processo desempilhado', temp)
-            else:
-                raise Mensagem('espaco liberado')
+            # else:
+            #     raise Mensagem('espaco liberado')
         else:
             raise Mensagem('segmento nao encontrado')
