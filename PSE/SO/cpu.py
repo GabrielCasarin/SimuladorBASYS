@@ -13,12 +13,11 @@ class CPU(object):
     def reserva(self, job):
         if self.busy:
             self.fila.push(job)
-            raise Mensagem('inserido na fila da CPU')
+            # raise Mensagem('inserido na fila da CPU')
         else:
             self.job_em_execucao = job
             self.busy = True
             raise Mensagem('alocado com sucesso')
-
 
     def libera(self):
         self.busy = False

@@ -84,19 +84,31 @@ class Maquina(MaquinaBase):
                     self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.t_ocorrencia)
             # elif mensagemRetorno == 'inserido na fila da memoria':
 
-    def RequisitarCPU(self):
-        if job.tempo_transcorrido + timeSlice > job.T_MaxCPU:
-            job.sinc(job.T_MaxCPU - job.tempo_transcorrido)
-        else:
-            job.sinc(timeSlice)
+    def RequisitarCPU(self, job):
+        try:
+            self.CPU.reserva(job)
+        except Mensagem as e:
+            if e == 'alocado com sucesso':
+                timeSlice = self.CPU.timeSlice
+                if job.tempo_transcorrido + timeSlice > job.T_MaxCPU:
+                    job.sinc(job.T_MaxCPU - job.tempo_transcorrido)
+                else:
+                    job.sinc(timeSlice)
 
-        job.run()
+                job.run()
+                #TODO: inserir desaloca
 
-    # def AcessarArquivo(self):
+    # def AcessarArquivo(self, job):
     #     pass
 
-    def LiberarCPU(self):
-        pass
+    def LiberarCPU(self, job):
+        try:
+            self.CPU.libera()
+        except Mensagem as e:
+            if e == 'job desempilhado':
+                pass
+            elif e == 'CPU livre':
+                pass
 
     def LiberarMemoria(self, job):
         try:
@@ -105,21 +117,13 @@ class Maquina(MaquinaBase):
 
         except Mensagem as e:
 
+            if e == 'processo desempilhado':
+                nome, tamamanhoSegmento, job = e.value
 
-    def FinilizarJob(self):
+
+    def FinilizarJob(self, job):
         pass
 
-
-    # dicionario de eventos
-    Eventos = {
-        '<Iniciar>': Iniciar,
-        '<RequisitarMemoria>': RequisitarMemoria,
-        '<RequisitarCPU>': RequisitarCPU,
-        '<AcessarArquivo>': AcessarArquivo,
-        '<LiberarCPU>': LiberarCPU,
-        '<LiberarMemoria>': LiberarMemoria,
-        '<FinilizarJob>': FinilizarJob,
-    }
 
     def addSimulador(self, simulador):
         if isinstance(simulador, Simulador):
