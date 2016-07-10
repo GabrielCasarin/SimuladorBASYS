@@ -29,15 +29,11 @@ class Maquina(MaquinaBase):
         # self.leitora1 = leitora.Leitora()
         # self.leitora2 = leitora.Leitora()
 
-        # Filas de recursos
-        # self.cm_q = lista.ListaPrioritaria()
-        # self.cpu_q = lista.ListaPrioritaria()
-        # self.disk_q = lista.ListaPrioritaria()
-
-        # Job table
+        # tabela com todos os jobs a serem simulados
         self.jobs_inativos = {
             job.nome: job for job in jobs
         }
+        # Job table
         self.job_table = list()
         self.job_atual_ptr = 0
 
@@ -52,19 +48,19 @@ class Maquina(MaquinaBase):
             self.RequisitarMemoria()
 
         elif evento.tipo() == '<RequisitarCPU>':
-            pass
+            self.RequisitarCPU()
 
-        elif evento.tipo() == '<AcessarArquivo>':
-            pass
+        # elif evento.tipo() == '<AcessarArquivo>':
+        #     self.AcessarArquivo()
 
-        elif evento.tipo() == '<Event5>':
-            pass
+        elif evento.tipo() == '<LiberarCPU>':
+            self.LiberarCPU()
 
         elif evento.tipo() == '<LiberarMemoria>':
-            pass
+            self.LiberarMemoria()
 
         elif evento.tipo() == '<FinilizarJob>':
-            pass
+            self.FinilizarJob()
 
 
     # rotinas de tratamento de interrupcoes
@@ -78,25 +74,37 @@ class Maquina(MaquinaBase):
 
 
     def RequisitarMemoria(self, job):
+        agora = self.simulador._agora
         try:
-            self.memoria.requisitar(job)
-        except Mensagem as mensagemRetorno:
-            if mensagemRetorno == 'alocado':
-                eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.simulador._agora + self.memoria.T_relocacao, job)
-                self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.t_ocorrencia)
-            # elif mensagemRetorno == 'enfileirado':
+            self.memoria.requisitar(nome, tamamanhoSegmento, job, agora)
+        except Mensagem as e:
+            if e == 'alocado com sucesso' or \
+                e == 'segmento ja alocado':
+                    eventoRequisicaoCPU = Evento('<RequisitarCPU>', agora + self.memoria.T_relocacao, job)
+                    self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.t_ocorrencia)
+            # elif mensagemRetorno == 'inserido na fila da memoria':
 
     def RequisitarCPU(self):
+        if job.tempo_transcorrido + timeSlice > job.T_MaxCPU:
+            job.sinc(job.T_MaxCPU - job.tempo_transcorrido)
+        else:
+            job.sinc(timeSlice)
+
+        job.run()
+
+    # def AcessarArquivo(self):
+    #     pass
+
+    def LiberarCPU(self):
         pass
 
-    def AcessarArquivo(self):
-        pass
+    def LiberarMemoria(self, job):
+        try:
 
-    def Event5(self):
-        pass
+            self.memoria.liberar(nome)
 
-    def LiberarMemoria(self):
-        pass
+        except Mensagem as e:
+
 
     def FinilizarJob(self):
         pass
@@ -108,7 +116,7 @@ class Maquina(MaquinaBase):
         '<RequisitarMemoria>': RequisitarMemoria,
         '<RequisitarCPU>': RequisitarCPU,
         '<AcessarArquivo>': AcessarArquivo,
-        '<Event5>': Event5,
+        '<LiberarCPU>': LiberarCPU,
         '<LiberarMemoria>': LiberarMemoria,
         '<FinilizarJob>': FinilizarJob,
     }

@@ -21,7 +21,7 @@ class Memoria(object):
         # caso nao haja espaco suficiente
         if tamamanhoSegmento > self.mem_disponivel:
             self.fila.push((nome, tamamanhoSegmento, job), 1, tempoAtual)
-            raise Mensagem('inserido na fila da MP')
+            raise Mensagem('inserido na fila da memoria')
         else:
         # caso haja
             self.mem_disponivel -= tamamanhoSegmento
