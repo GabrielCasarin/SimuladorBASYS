@@ -23,7 +23,16 @@ class Simulador(object):
 
     def addTask(self, task, priority, time):
         """Add a new task."""
-        self._listaEventos.push(task, priority, time)
+        achou = False
+        for el in self._listaEventos.pq:
+            if el[0] == priority and el[1] == time:
+                achou = True
+                break
+
+        if achou:
+            self._listaEventos.push(task, priority+1, time)
+        else:
+            self._listaEventos.push(task, priority, time)
 
     def nextTask(self):
         """Remove and return the lowest priority task."""
