@@ -12,6 +12,7 @@ class Job(object):
         self.tempo_restante = T_MaxCPU
         self.tempo_transcorrido = 0
         self.segmentos = segmentos
+        self.segmentos_ativos = set()
         self.DiscoCount = DiscoCount  # qtde de acessos ao disco
         self.LeitoraCount = LeitoraCount  # qtde de leituras de cartao
         self.ImpressoraCount = ImpressoraCount   # qtde de impressoes
@@ -29,19 +30,42 @@ class Job(object):
         while len(times) > 0:
             novo_evento = Evento('<RequisitarMemoria>', times.pop(), self)
             self.eventos_programados.append(novo_evento)
+        random.shuffle(self.segmentos)
+
+        self.status = None
+
+    def atualizar_status(self, novo_status):
+        self.status = novo_status
 
     def _sinc(self, tempo_avanco):
-        self.tempoTranscorrido += tempo_avanco
+        self.tempo_transcorrido += tempo_avanco
 
     def run(self, tempo_avanco):
         # last_time = self.tempo_transcorrido
-        for evento in eventos_programados:
-            if self.tempo_transcorrido <= evento.t_ocorrencia < self.tempo_transcorrido + tempo_avanco:
-                self._sinc(evento.t_ocorrencia - self.tempo_transcorrido)
-                raise Mensagem('evento solicitado', evento)
+        # for evento in eventos_programados:
+        #     if self.tempo_transcorrido <= evento.t_ocorrencia < self.tempo_transcorrido + tempo_avanco:
+        #         self._sinc(evento.t_ocorrencia - self.tempo_transcorrido)
+        #         raise Mensagem('evento solicitado', evento)
         # caso nenhum evento tenha sido solicitado
         self._sinc(tempo_avanco)
+        raise Mensagem('time slice completado')
 
+    def gera_log(self):
+        print('Job:', self.nome)
+        print('\tinstante de chegada:', self.T_chegada)
+        print('\ttempo maximo de CPU:', self.T_MaxCPU)
+        # print('\tsegmentos:', self.segmentos)
+        print('\tQuantidade de acessos ao Disco:', self.DiscoCount)
+        print('\tQuantidade de acessos aa Leitora:', self.LeitoraCount)
+        print('\tQuantidade de acessos aa Impressora:', self.ImpressoraCount)
+        print('Eventos programados:')
+        for evento in self.eventos_programados:
+            print('\t\ttipo: {0}\tinstante previsto: {1}'.format(evento.tipo, evento.T_ocorrencia))
+
+    def prox_segmento(self):
+        seg = self.segmentos.pop()
+        self.segmentos.insert(0, seg)
+        return seg
 
     def __eq__(self, job):
         if isinstance(job, Job):

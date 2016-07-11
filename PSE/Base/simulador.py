@@ -23,7 +23,7 @@ class Simulador(object):
 
     def addTask(self, task, priority, time):
         """Add a new task."""
-        self._listaEventos.push(task, priority, self._agora + time)
+        self._listaEventos.push(task, priority, time)
 
     def nextTask(self):
         """Remove and return the lowest priority task."""
@@ -39,6 +39,6 @@ class Simulador(object):
             self._agora = max(self._agora, time)
             self._Maquina.trataEvento(task)
             chegouFimSimulacao = self._Maquina.fim(task)
-            self._Maquina.printEvent(task)
+            # self._Maquina.printEvent(task)
 
         print("## STOPED simulation at:", self._agora, " ##")

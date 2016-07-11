@@ -52,6 +52,8 @@ with open('so1.txt') as arq_jobs:
 
 mac = Maquina(T_acionamento_clk, T_final, time_slice_size=time_slice_size, max_processos=max_processos, disco_tempo_leitura=disco_tempo_leitura, disco_tempo_escrita=disco_tempo_escrita, disco_tamanho=disco_tamanho, memoria_tempo_relocacao=memoria_tempo_relocacao, memoria_tempo_transferencia=memoria_tempo_transferencia, memoria_tamanho=memoria_tamanho)#, jobs=jobs)
 sim = Simulador(mac)
+print(mac.simulador)
 for job in jobs:
   eventoChegadaJob = Evento('<Iniciar>', job.T_chegada, job)
   sim.addTask(eventoChegadaJob, 1, eventoChegadaJob.T_ocorrencia)
+sim.simulate()

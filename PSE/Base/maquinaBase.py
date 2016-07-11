@@ -7,17 +7,17 @@ class MaquinaBase(object):
 
     def __init__(self):
         """constructor."""
-        self._simulator = None
+        self.simulador = None
         u"""@ivar:uma referência para o simulador associado à máquina
         @type: Simulador.Simulador """
 
-    def setSimulator(self, simulator):
+    def setSimulator(self, simulador):
         """set a reference of the Simulator caller for the Maquina instance.
-        @param simulator: uma referência para o simulador associado à máquina
-        @type simulator: Simulador"""
+        @param simulador: uma referência para o simulador associado à máquina
+        @type simulador: Simulador"""
         from PSE.Base.simulador import Simulador
-        if isinstance(simulator, Simulador):
-            self._simulator = simulator
+        if isinstance(simulador, Simulador):
+            self.simulador = simulador
 
     def trataEvento(self, task):
         """chama a sub-rotina apropriada que trata o evento dado.

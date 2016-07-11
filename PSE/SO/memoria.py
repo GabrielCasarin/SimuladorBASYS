@@ -35,9 +35,15 @@ class Memoria(object):
             self.mem_disponivel += self.segmentos[nome].tamamanhoSegmento
             self.segmentos.pop(nome)
             if len(self.fila) > 0:
-                temp, _ = self.fila.pop()
-                raise Mensagem('processo desempilhado', temp)
-            # else:
-            #     raise Mensagem('espaco liberado')
+                # verifica se ha possibilidade de colocar novo segmento na memoria
+                p, t = self.fila.pop()
+                tamamanhoSegmento = p[1]
+                if tamamanhoSegmento <= self.mem_disponivel:
+                    raise Mensagem('processo desempilhado', p)
+                else:
+                    # se nao adianta tentar alocar memoria, coloca de novo na fila com mesmo tempo de chegada
+                    self.fila.push(p, 1, t)
+            else:
+                raise Mensagem('espaco liberado')
         else:
             raise Mensagem('segmento nao encontrado')
