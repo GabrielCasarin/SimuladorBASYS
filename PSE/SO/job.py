@@ -17,21 +17,36 @@ class Job(object):
         self.LeitoraCount = LeitoraCount  # qtde de leituras de cartao
         self.ImpressoraCount = ImpressoraCount   # qtde de impressoes
 
-        random.seed(T_MaxCPU)
+        random.seed(T_MaxCPU + ImpressoraCount + LeitoraCount)
         # programa uma serie de eventos
         self.eventos_programados = list()
 
-        qtde_eventos = len(segmentos)
+        qtde_eventos = ImpressoraCount + LeitoraCount
 
         times = [i*T_MaxCPU/(qtde_eventos + 1) for i in range(1, qtde_eventos + 1)]
         m = map(lambda e : e + random.gauss(0.0, T_MaxCPU*.05), times)
         times = [int(e) for e in m]
+        # embaralha os instantes de interrupcao
         random.shuffle(times)
-        while len(times) > 0:
-            novo_evento = Evento('<RequisitarMemoria>', times.pop(), self)
-            self.eventos_programados.append(novo_evento)
+
+        # programa as mudancas de segmento
+        # for _ in range(len(self.segmentos)):
+        #     novo_evento = Evento('<RequisitarMemoria>', times.pop(), self)
+        #     self.eventos_programados.append(novo_evento)
+        # embaralha a ordem em que os segmentos sao chamados
         random.shuffle(self.segmentos)
 
+        # programa as impressoes
+        for _ in range(self.ImpressoraCount):
+            eventoImpressao = Evento('<Imprimir>', times.pop(), self, random.choice(['P1', 'P2']))
+            self.eventos_programados.append([eventoImpressao, False])
+
+        # programa as leituras
+        # for _ in range(self.LeitoraCount):
+        #     eventoLeitura = Evento('<Leitura>', times.pop(), self, random.choice(['L1', 'L2']))
+        #     self.eventos_programados.append(eventoLeitura)
+
+        # status do job que varia durante o seu curso de vida
         self.status = None
 
     def atualizar_status(self, novo_status):
@@ -41,11 +56,12 @@ class Job(object):
         self.tempo_transcorrido += tempo_avanco
 
     def run(self, tempo_avanco):
-        # last_time = self.tempo_transcorrido
-        # for evento in eventos_programados:
-        #     if self.tempo_transcorrido <= evento.t_ocorrencia < self.tempo_transcorrido + tempo_avanco:
-        #         self._sinc(evento.t_ocorrencia - self.tempo_transcorrido)
-        #         raise Mensagem('evento solicitado', evento)
+        last_time = self.tempo_transcorrido
+        for evento in self.eventos_programados:
+            if last_time <= evento[0].T_ocorrencia < last_time + tempo_avanco and not evento[1]:
+                evento[1] = True
+                self.tempo_transcorrido = evento[0].T_ocorrencia
+                raise Mensagem('evento solicitado', (evento[0], evento[0].T_ocorrencia - last_time))
         # caso nenhum evento tenha sido solicitado
         self._sinc(tempo_avanco)
         raise Mensagem('time slice completado')
@@ -58,9 +74,9 @@ class Job(object):
         print('\tQuantidade de acessos ao Disco:', self.DiscoCount)
         print('\tQuantidade de acessos aa Leitora:', self.LeitoraCount)
         print('\tQuantidade de acessos aa Impressora:', self.ImpressoraCount)
-        print('Eventos programados:')
-        for evento in self.eventos_programados:
-            print('\t\ttipo: {0}\tinstante previsto: {1}'.format(evento.tipo, evento.T_ocorrencia))
+        print('\tEventos programados (tempos a partir do inicio da execucao do processo):')
+        for evento in sorted(self.eventos_programados, key = lambda t : t[0].T_ocorrencia):
+            print('\t\ttipo: {0}\tinstante previsto: {1}'.format(evento[0].tipo, evento[0].T_ocorrencia))
 
     def prox_segmento(self):
         seg = self.segmentos.pop()

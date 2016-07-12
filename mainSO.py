@@ -24,6 +24,11 @@ with open('parametros_simulador.txt') as conf_sim:
           memoria_tempo_transferencia = int(atributo[1])
         elif atributo[0] == 'memoria_tamanho':
           memoria_tamanho = int(atributo[1])
+        elif atributo[0] == 'impressora_tempo_impressao':
+          impressora_tempo_impressao = int(atributo[1])
+        elif atributo[0] == 'leitora_tempo_leitura':
+          leitora_tempo_leitura = int(atributo[1])
+
 
 with open('so1.txt') as arq_jobs:
   linhas = arq_jobs.readlines()
@@ -45,14 +50,24 @@ with open('so1.txt') as arq_jobs:
       for seg in seg_iter:
           estrutura_seg.append((seg.group(1),int(seg.group(2))))
       ioqtde = int(linha[4]) # quantidade de acessos ao disco
+      impressao_qtde = int(linha[5])
+      leitura_qtde = int(linha[6])
 
       # cria um novo job
-      novo_job = Job(nome, T_chegada=ti, T_MaxCPU=tmax, segmentos=estrutura_seg, DiscoCount=0, LeitoraCount=0, ImpressoraCount=0)
+      novo_job = Job(nome, T_chegada=ti, T_MaxCPU=tmax, segmentos=estrutura_seg, DiscoCount=0, LeitoraCount=leitura_qtde, ImpressoraCount=impressao_qtde)
       jobs.append(novo_job)
 
-mac = Maquina(T_acionamento_clk, T_final, time_slice_size=time_slice_size, max_processos=max_processos, disco_tempo_leitura=disco_tempo_leitura, disco_tempo_escrita=disco_tempo_escrita, disco_tamanho=disco_tamanho, memoria_tempo_relocacao=memoria_tempo_relocacao, memoria_tempo_transferencia=memoria_tempo_transferencia, memoria_tamanho=memoria_tamanho)#, jobs=jobs)
+mac = Maquina(T_acionamento_clk, T_final, time_slice_size=time_slice_size, max_processos=max_processos, disco_tempo_leitura=disco_tempo_leitura, disco_tempo_escrita=disco_tempo_escrita, disco_tamanho=disco_tamanho, memoria_tempo_relocacao=memoria_tempo_relocacao, memoria_tempo_transferencia=memoria_tempo_transferencia, memoria_tamanho=memoria_tamanho, leitora_tempo_leitura=leitora_tempo_leitura, impressora_tempo_impressao=impressora_tempo_impressao)#, jobs=jobs)
 sim = Simulador(mac)
 for job in jobs:
   eventoChegadaJob = Evento('<Iniciar>', job.T_chegada, job)
   sim.addTask(eventoChegadaJob, 1, eventoChegadaJob.T_ocorrencia)
 sim.simulate()
+
+print('\n')
+print('################')
+print('#     Jobs     #')
+print('################')
+for job in jobs:
+    job.gera_log()
+    print()

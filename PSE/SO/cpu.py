@@ -12,7 +12,8 @@ class CPU(object):
 
     def reserva(self, job, prioridade):
         if self.busy:
-            self.fila.insert(0, job)
+            if job not in self.fila:
+                self.fila.insert(0, job)
             raise Mensagem('inserido na fila da CPU')
         else:
             self.job_em_execucao = job

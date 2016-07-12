@@ -6,3 +6,5 @@ disco_tamanho = 80000
 memoria_tempo_transferencia = 4
 memoria_tempo_relocacao = 5
 memoria_tamanho = 2000
+impressora_tempo_impressao = 200
+leitora_tempo_leitura = 300

@@ -1,0 +1,246 @@
+##  STARTED simulation at: 0  ##
+10	<Iniciar>:
+	job J0 inserido na tabela
+
+10	<RequisitarMemoria>:
+	job J0 ganhou 200 bytes de memoria para o segmento 'b'
+
+15	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+23	<Iniciar>:
+	job J1 inserido na tabela
+
+23	<RequisitarMemoria>:
+	job J1 ganhou 300 bytes de memoria para o segmento 'c'
+
+28	<RequisitarCPU>:
+	job J1 inserido na fila da CPU
+
+35	<LiberarCPU>:
+	job J0 liberou CPU
+
+35	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+55	<LiberarCPU>:
+	job J1 liberou CPU
+
+55	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+75	<LiberarCPU>:
+	job J0 liberou CPU
+
+75	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+95	<LiberarCPU>:
+	job J1 liberou CPU
+
+95	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+115	<LiberarCPU>:
+	job J0 liberou CPU
+
+115	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+135	<LiberarCPU>:
+	job J1 liberou CPU
+
+135	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+155	<LiberarCPU>:
+	job J0 liberou CPU
+
+155	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+175	<LiberarCPU>:
+	job J1 liberou CPU
+
+175	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+195	<LiberarCPU>:
+	job J0 liberou CPU
+
+195	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+215	<LiberarCPU>:
+	job J1 liberou CPU
+
+215	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+235	<LiberarCPU>:
+	job J0 liberou CPU
+
+235	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+255	<LiberarCPU>:
+	job J1 liberou CPU
+
+255	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+263	<Imprimir>:
+	job J0 iniciou impressao na impressora P1
+
+263	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+283	<LiberarCPU>:
+	job J1 liberou CPU
+
+283	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+303	<LiberarCPU>:
+	job J1 liberou CPU
+
+303	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+323	<LiberarCPU>:
+	job J1 liberou CPU
+
+323	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+343	<LiberarCPU>:
+	job J1 liberou CPU
+
+343	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+363	<LiberarCPU>:
+	job J1 liberou CPU
+
+363	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+383	<LiberarCPU>:
+	job J1 liberou CPU
+
+383	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+403	<LiberarCPU>:
+	job J1 liberou CPU
+
+403	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+423	<LiberarCPU>:
+	job J1 liberou CPU
+
+423	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 20 u.t.
+
+443	<FinalizarJob>:
+	job J1 concluiu-se
+
+		               
+	job J1 foi desempilhado da fila da CPU
+
+443	<RequisitarCPU>:
+	job J1 ganhou CPU por ate 0 u.t.
+
+443	<FinalizarJob>:
+	job J1 concluiu-se
+
+463	<LiberarImpressora>:
+	Impressora P1 terminou execucao
+
+463	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+483	<LiberarCPU>:
+	job J0 liberou CPU
+
+483	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+503	<LiberarCPU>:
+	job J0 liberou CPU
+
+503	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+523	<LiberarCPU>:
+	job J0 liberou CPU
+
+523	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+543	<LiberarCPU>:
+	job J0 liberou CPU
+
+543	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+563	<LiberarCPU>:
+	job J0 liberou CPU
+
+563	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+583	<LiberarCPU>:
+	job J0 liberou CPU
+
+583	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+603	<LiberarCPU>:
+	job J0 liberou CPU
+
+603	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 20 u.t.
+
+623	<LiberarCPU>:
+	job J0 liberou CPU
+
+623	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 12 u.t.
+
+635	<FinalizarJob>:
+	job J0 concluiu-se
+
+		               
+	job J0 foi desempilhado da fila da CPU
+
+635	<RequisitarCPU>:
+	job J0 ganhou CPU por ate 0 u.t.
+
+635	<FinalizarJob>:
+	job J0 concluiu-se
+
+## STOPED simulation at: 635  ##
+
+
+################
+#     Jobs     #
+################
+Job: J0
+	instante de chegada: 10
+	tempo maximo de CPU: 300
+	Quantidade de acessos ao Disco: 0
+	Quantidade de acessos aa Leitora: 0
+	Quantidade de acessos aa Impressora: 1
+	Eventos programados (tempos a partir do inicio da execucao do processo):
+		tipo: <Imprimir>	instante previsto: 128
+
+Job: J1
+	instante de chegada: 23
+	tempo maximo de CPU: 300
+	Quantidade de acessos ao Disco: 0
+	Quantidade de acessos aa Leitora: 0
+	Quantidade de acessos aa Impressora: 0
+	Eventos programados (tempos a partir do inicio da execucao do processo):
+

@@ -27,10 +27,13 @@ class Simulador(object):
         for el in self._listaEventos.pq:
             if el[0] == priority and el[1] == time:
                 achou = True
+                # print('achei')
+                # print(el, el[2].tipo)
+                # print([priority, time, task], task.tipo)
                 break
 
         if achou:
-            self._listaEventos.push(task, priority+1, time)
+            self._listaEventos.push(task, priority+1, time) # diminui a prioridade de quem chegou depois
         else:
             self._listaEventos.push(task, priority, time)
 
