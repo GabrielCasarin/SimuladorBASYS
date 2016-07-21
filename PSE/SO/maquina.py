@@ -23,20 +23,22 @@ class Maquina(MaquinaBase):
 
         ## dispositivos que a maquina deve conter
         self.CPU = CPU(time_slice_size)
-        self.disco = Disco(disco_tempo_leitura, disco_tempo_escrita, disco_tamanho)
         self.memoria = Memoria(memoria_tempo_relocacao, memoria_tempo_transferencia, memoria_tamanho)
+        self.disco = Disco(disco_tempo_leitura, disco_tempo_escrita, disco_tamanho)
+        # impressoras
         self.impressora1 = Impressora('P1', impressora_tempo_impressao)
         self.impressora2 = Impressora('P2', impressora_tempo_impressao)
-        # self.leitora1 = Leitora('L1', leitora)
-        # self.leitora2 = Leitora('L2', )
         self.impressorasID = {
             'P1': self.impressora1,
             'P2': self.impressora2,
         }
-        # self.leitorasID = {
-        #     'L1': self.leitora1,
-        #     'L2': self.leitora2,
-        # }
+        # leitoras
+        self.leitora1 = Leitora('L1', leitora_tempo_leitura)
+        self.leitora2 = Leitora('L2', leitora_tempo_leitura)
+        self.leitorasID = {
+            'L1': self.leitora1,
+            'L2': self.leitora2,
+        }
 
         ## tabela com todos os jobs a serem simulados
         # self.jobs_inativos = {
@@ -46,7 +48,6 @@ class Maquina(MaquinaBase):
         #     eventoChegadaJob = Evento('<Iniciar>', job.T_chegada, job)
         ## Job table
         self.job_table = list()
-        # self.job_atual_ptr = 0
 
     def trataEvento(self, evento):
         if self.simulador._agora <= self.T_final:
@@ -85,8 +86,9 @@ class Maquina(MaquinaBase):
                 self.EncerrarSimulacao()
 
 
-    # rotinas de tratamento de interrupcoes
+    # Rotinas de tratamento de interrupcoes
 
+    ## ---------------- ROTINAS DO JOB --------------- ##
     def Iniciar(self, novo_job):
         novo_job.atualizar_status('chegou')
         # insere o job na tabela de jobs ativos
@@ -97,7 +99,43 @@ class Maquina(MaquinaBase):
         novo_job.atualizar_status('aguardando memoria')
         print('{0}\t<Iniciar>:\n\tjob {1} inserido na tabela\n'.format(self.simulador._agora, novo_job.nome))
 
+    def FinalizarJob(self, job):
+        print('fila:', self.CPU.fila)
+        # libera a CPU
+        try:
+            self.CPU.libera()
+        except Mensagem as e:
+            job.atualizar_status('completo')
+            print('{0}\t<FinalizarJob>:\n\tjob {1} concluiu-se\n'.format(self.simulador._agora, job.nome))
+            if e.msg == 'job desempilhado':
+                print('\tjob {0} foi desempilhado da fila da CPU\n'.format(job.nome))
+                eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.simulador._agora, job=e.value)
+                self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
 
+        # libera a memoria
+        for seg in list(job.segmentos_ativos):
+            try:
+                self.memoria.liberar(seg)
+            except Mensagem as e:
+                # remove da lista de segmentos ativos aquele que acabou de ser retirado da memoria
+                job.segmentos_ativos.remove(seg)
+                if e.msg == 'processo desempilhado':
+                    # pega o job que estava pedindo memoria e marca uma requisicao de memoria para ele
+                    nome, tamamanhoSegmento, job_desempilhado = e.value
+                    eventoRequisicaoMem = Evento('<RequisitarMemoria>', self.simulador._agora + self.memoria.T_relocacao, job_desempilhado)
+                    print('\tjob {1} liberou o segmento \'{2}\'\n'.format(self.simulador._agora, job.nome, seg))
+                    self.simulador.addTask(eventoRequisicaoMem, 1, eventoRequisicaoMem.T_ocorrencia)
+                elif e.msg == 'espaco liberado':
+                    print('\tjob {1} liberou o segmento \'{2}\'\n'.format(self.simulador._agora, job.nome, seg))
+                elif e.msg == 'segmento nao encontrado':
+                    print('\tfalta de segmento {2} (job {1})\n'.format(self.simulador._agora, job.nome, e.value))
+                job.atualizar_status('pronto')
+
+    def EncerrarSimulacao(self):
+        print('{0}\t<EncerrarSimulacao>:\n\tSimulacao acabou-se\n'.format(self.simulador._agora))
+    ## ---------------- FIM ROTINAS DO JOB --------------- ##
+
+    ## ---------------- MEMORIA CM ---------------- ##
     def RequisitarMemoria(self, nome_seg, tamamanhoSegmento, job, T_ocorrencia):
         agora = self.simulador._agora
         try:
@@ -119,7 +157,6 @@ class Maquina(MaquinaBase):
     def LiberarMemoria(self, job, nome_seg):
         try:
             self.memoria.liberar(nome_seg)
-
         except Mensagem as e:
             if e.msg == 'processo desempilhado':
                 job.segmentos_ativos.remove(nome_seg)
@@ -133,12 +170,15 @@ class Maquina(MaquinaBase):
             elif e.msg == 'segmento nao encontrado':
                 print('{0}\t<LiberarMemoria>:\n\tfalta de segmento (job {1})\n'.format(self.simulador._agora, job.nome))
             job.atualizar_status('pronto')
+    ## ---------------- FIM MEMORIA CM ---------------- ##
 
-
+    ## ---------------- ARQUIVO ---------------- ##
     def AcessarArquivo(self, job):
         pass
 
+    ## ---------------- ESCALONAMENTO CPU ---------------- ##
     def RequisitarCPU(self, job):
+        print('fila:', self.CPU.fila)
         agora = self.simulador._agora
         try:
             self.CPU.reserva(job, 1)
@@ -171,8 +211,12 @@ class Maquina(MaquinaBase):
                 print('{0}\t<RequisitarCPU>:\n\tjob {1} inserido na fila da CPU\n'.format(agora, job.nome))
 
     def LiberarCPU(self, job):
+        print('fila:', self.CPU.fila)
         try:
             job_antigo = self.CPU.job_em_execucao
+            # Round Robin
+            if job_antigo not in self.CPU.fila:
+                self.CPU.fila.insert(0, job_antigo)
             self.CPU.libera()
         except Mensagem as e:
             job.atualizar_status('pronto')
@@ -183,12 +227,9 @@ class Maquina(MaquinaBase):
                 eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.simulador._agora, job=job_antigo)
 
             self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
+    ## ---------------- FIM ESCALONAMENTO CPU ---------------- ##
 
-            # Round Robin
-            if job_antigo not in self.CPU.fila:
-                self.CPU.fila.insert(0, job_antigo)
-
-
+    ## ---------------- IMPRESSORA ---------------- ##
     def Imprimir(self, job, impressora):
         agora = self.simulador._agora
         impressora = self.impressorasID[impressora]
@@ -228,27 +269,56 @@ class Maquina(MaquinaBase):
             self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
             if job not in self.CPU.fila:
                 self.CPU.fila.insert(0, job)
+    ## ---------------- FIM IMPRESSORA ---------------- ##
 
-    def FinalizarJob(self, job):
+    ## ---------------- LEITORA ---------------- ##
+    def Leitura(self, job, leitora):
+        agora = self.simulador._agora
+        leitora = self.leitorasID[leitora]
+        job.atualizar_status('espera e/s')
+
+        # libera CPU "na marra"
         try:
             self.CPU.libera()
         except Mensagem as e:
-            job.atualizar_status('completo')
-            print('{0}\t<FinalizarJob>:\n\tjob {1} concluiu-se\n'.format(self.simulador._agora, job.nome))
             if e.msg == 'job desempilhado':
-                print('\t\t               \n\tjob {0} foi desempilhado da fila da CPU\n'.format(job.nome))
                 eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.simulador._agora, job=e.value)
                 self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
 
-    def EncerrarSimulacao(self):
-        print('{0}\t<EncerrarSimulacao>:\n\tSimulacao acabou-se\n'.format(self.simulador._agora, job.nome))
+        try:
+            leitora.requisita(job)
+        except Mensagem as e:
+            if e.msg == 'alocado com sucesso':
+                eventoLiberarLeitora = Evento('<LiberarLeitora>', agora + leitora.T_leitura, job, leitora)
+                self.simulador.addTask(eventoLiberarLeitora, 1, eventoLiberarLeitora.T_ocorrencia)
+                print('{0}\t<Leitura>:\n\tjob {1} iniciou leitura na leitora {2}\n'.format(self.simulador._agora, job.nome, leitora.label))
+            elif e.msg == 'leitora ocupada':
+                print('{0}\t<Leitura>:\n\tjob {1} entrou na fila de leitura\n'.format(self.simulador._agora, job.nome))
 
+    def LiberarLeitora(self, job, impressora):
+        try:
+            impressora.libera()
+        except Mensagem as e:
+            if e.msg == 'job desempilhado':
+                eventoRequisicaoImpressao('<Imprimir>', self.simulador._agora, job=e.value)
+                self.simulador.addTask(eventoRequisicaoImpressao, 1, eventoRequisicaoImpressao.T_ocorrencia)
+                print('{0}\t<LiberarImpressora>:\n\tImpressora {1} terminou execucao. Job {2} saiu da fila\n'.format(self.simulador._agora, impressora.label, e.value.nome))
+            elif e.msg == 'leitora livre':
+                print('{0}\t<LiberarImpressora>:\n\tImpressora {1} terminou execucao\n'.format(self.simulador._agora, impressora.label))
 
-    def addSimulador(self, simulador):
+            # em ambos os casos, o job liberado entra no round robin novamente
+            eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.simulador._agora, job=job)
+            self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
+            if job not in self.CPU.fila:
+                self.CPU.fila.insert(0, job)
+    ## ---------------- FIM LEITORA ---------------- ##
+
+    ## Demais rotinas
+    def setSimulator(self, simulador):
         if isinstance(simulador, Simulador):
             self.simulador = simulador
             self.simulador._agora = self.T_acionamento_clk
-            self.simulador.addTask(Evento('<EncerrarSimulacao>', self.T_final))
+            self.simulador.addTask(Evento('<EncerrarSimulacao>', self.T_final), 1, self.T_final)
         else:
             self.simulador = None
 

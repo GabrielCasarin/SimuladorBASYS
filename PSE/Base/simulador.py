@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 u"""Simulador Estocástico dirigido por Eventos."""
-# import datetime
 from PSE.Base.lista import ListaPrioritaria
 from PSE.Base.maquinaBase import MaquinaBase
 
@@ -14,7 +13,6 @@ class Simulador(object):
         @param machine: uma instancia de uma máquina a ser simulada
         @type machine: Maquina"""
         self._listaEventos = ListaPrioritaria()
-        # self._agora = datetime.timedelta()
         self._agora = 0
 
         if isinstance(machine, MaquinaBase):
@@ -27,9 +25,6 @@ class Simulador(object):
         for el in self._listaEventos.pq:
             if el[0] == priority and el[1] == time:
                 achou = True
-                # print('achei')
-                # print(el, el[2].tipo)
-                # print([priority, time, task], task.tipo)
                 break
 
         if achou:

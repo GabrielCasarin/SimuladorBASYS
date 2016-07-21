@@ -21,7 +21,7 @@ class Job(object):
         # programa uma serie de eventos
         self.eventos_programados = list()
 
-        qtde_eventos = ImpressoraCount + LeitoraCount
+        qtde_eventos = ImpressoraCount + LeitoraCount #+ len(segmentos)
 
         times = [i*T_MaxCPU/(qtde_eventos + 1) for i in range(1, qtde_eventos + 1)]
         m = map(lambda e : e + random.gauss(0.0, T_MaxCPU*.05), times)
@@ -42,12 +42,19 @@ class Job(object):
             self.eventos_programados.append([eventoImpressao, False])
 
         # programa as leituras
-        # for _ in range(self.LeitoraCount):
-        #     eventoLeitura = Evento('<Leitura>', times.pop(), self, random.choice(['L1', 'L2']))
-        #     self.eventos_programados.append(eventoLeitura)
+        for _ in range(self.LeitoraCount):
+            eventoLeitura = Evento('<Leitura>', times.pop(), self, random.choice(['L1', 'L2']))
+            self.eventos_programados.append(eventoLeitura)
 
         # status do job que varia durante o seu curso de vida
         self.status = None
+
+        ## Tempo de espera em fila
+        self.tempo_espera_CPU = 0
+        self.tempo_espera_Memoria = 0
+        self.tempo_espera_Impressoras = 0
+        self.tempo_espera_Leitoras = 0
+
 
     def atualizar_status(self, novo_status):
         self.status = novo_status
@@ -75,8 +82,13 @@ class Job(object):
         print('\tQuantidade de acessos aa Leitora:', self.LeitoraCount)
         print('\tQuantidade de acessos aa Impressora:', self.ImpressoraCount)
         print('\tEventos programados (tempos a partir do inicio da execucao do processo):')
-        for evento in sorted(self.eventos_programados, key = lambda t : t[0].T_ocorrencia):
-            print('\t\ttipo: {0}\tinstante previsto: {1}'.format(evento[0].tipo, evento[0].T_ocorrencia))
+        if len(self.eventos_programados) > 0:
+            for evento in sorted(self.eventos_programados, key = lambda t : t[0].T_ocorrencia):
+                print('\t\ttipo: {0}\tinstante previsto: {1}'.format(evento[0].tipo, evento[0].T_ocorrencia))
+        print('\tTempo de espera em fila de CPU:', self.tempo_espera_CPU)
+        print('\tTempo de espera em fila de Memoria:', self.tempo_espera_Memoria)
+        print('\tTempo de espera em fila de Impressoras:', self.tempo_espera_Impressoras)
+        print('\tTempo de espera em fila de Leitoras:', self.tempo_espera_Leitoras)
 
     def prox_segmento(self):
         seg = self.segmentos.pop()

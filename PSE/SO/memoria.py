@@ -46,4 +46,4 @@ class Memoria(object):
             else:
                 raise Mensagem('espaco liberado')
         else:
-            raise Mensagem('segmento nao encontrado')
+            raise Mensagem('segmento nao encontrado', nome)
