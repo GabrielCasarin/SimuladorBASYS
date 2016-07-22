@@ -1,0 +1,18 @@
+{
+  "T_final_clk": 1000,
+  "T_acionamento_clk": 0,
+  "jobs": [
+    {
+      "nome": "J0",
+      "Ti": 10,
+      "Tmax": 300,
+      "segmentos": [
+        ["a",100],["b",200],["c",300]
+      ],
+      "arquivos": ["temp.txt", "temp2.txt"],
+      "IO": 5,
+      "impressoes": 3,
+      "leituras": 2
+    }
+  ]
+}
