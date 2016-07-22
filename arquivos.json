@@ -1,0 +1,14 @@
+[
+  {
+    "nome": "temp.txt",
+    "tamanho": 1000,
+    "proprietario": "J0",
+    "controle": "publico"
+  },
+  {
+    "nome": "temp2.txt",
+    "tamanho": 4000,
+    "proprietario": "J3",
+    "controle": "privado"
+  }
+]
