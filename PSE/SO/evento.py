@@ -8,4 +8,7 @@ class Evento(object):
         self.recurso = recurso
 
     def __str__(self):
-        return str(self.T_ocorrencia) + ' ' + self.tipo + ' ' + str(self.job)
+        if self.recurso is not None:
+            return "{0:>5}:\t{1:<20}\trecurso utilizado -> {2}".format(self.T_ocorrencia, self.tipo, self.recurso)
+        else:
+            return "{0:<5}:{1:<20}".format(self.T_ocorrencia, self.tipo)

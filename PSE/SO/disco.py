@@ -123,9 +123,9 @@ class Disco(object):
         return None
 
     def log_tabelaParticoes(self):
-        print("--------------------------------------------------------------")
-        print("| Particao |     Nome     | Proprietario | Tamanho | Acesso  |")
-        print("|----------|--------------|--------------|---------|---------|")
+        print("\t--------------------------------------------------------------")
+        print("\t| Particao |     Nome     | Proprietario | Tamanho | Acesso  |")
+        print("\t|----------|--------------|--------------|---------|---------|")
         i = 0
         while i < len(self.particoes):
             _, arquivo = self.particoes[i]
@@ -133,12 +133,12 @@ class Disco(object):
             tamanho = arquivo.tamanho
             proprietario = arquivo.proprietario
             controle = arquivo.controle
-            print("| {Particao:^8} | {Nome:12} | {Proprietario:12} | {Tamanho:<7} | {Acesso:7} |".format(Particao=i, Nome=nome, Proprietario=proprietario, Tamanho=tamanho, Acesso=controle))
+            print("\t| {Particao:^8} | {Nome:12} | {Proprietario:12} | {Tamanho:<7} | {Acesso:7} |".format(Particao=i, Nome=nome, Proprietario=proprietario, Tamanho=tamanho, Acesso=controle))
             i += 1
-        print("|------------------------------------------------------------|")
-        print("| Espaco ocupado: {:<42} |".format(self.espaco_ocupado))
-        print("| Espaco desalocado: {:<39} |".format(self.espaco_disponivel()))
-        print("--------------------------------------------------------------")
+        print("\t|------------------------------------------------------------|")
+        print("\t| Espaco ocupado: {:<42} |".format(self.espaco_ocupado))
+        print("\t| Espaco desalocado: {:<39} |".format(self.espaco_disponivel()))
+        print("\t--------------------------------------------------------------")
 
 class Arquivo(object):
     def __init__(self, nome, tamanho, proprietario, controle):
