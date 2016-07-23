@@ -47,7 +47,7 @@ class Maquina(MaquinaBase):
         self.agora = 0
 
     def trataEvento(self, evento):
-        self.sincRelogio(self.agora)
+        self.sincRelogio(self.simulador._agora)
 
         if self.agora <= self.T_final:
             if evento.tipo == '<Iniciar>':
