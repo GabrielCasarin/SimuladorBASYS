@@ -22,16 +22,7 @@ class Simulador(object):
 
     def addTask(self, task, priority, time):
         """Add a new task."""
-        # achou = False
-        # for el in self._listaEventos.pq:
-        #     if el[0] == priority and el[1] == time:
-        #         achou = True
-        #         break
-
-        # if achou:
         self._listaEventos.push((next(self.serie), task), priority, time) # diminui a prioridade de quem chegou depois
-        # else:
-        #     self._listaEventos.push(task, priority, time)
 
     def nextTask(self):
         """Remove and return the lowest priority task."""
@@ -48,6 +39,5 @@ class Simulador(object):
             self._agora = max(self._agora, time)
             self._Maquina.trataEvento(task)
             chegouFimSimulacao = self._Maquina.fim(task)
-            # self._Maquina.printEvent(task)
 
         print("## STOPED simulation at:", self._agora, " ##")
