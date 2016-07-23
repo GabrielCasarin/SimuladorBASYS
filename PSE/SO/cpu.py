@@ -9,6 +9,7 @@ class CPU(object):
         self.busy = False
         self.fila = list()
         self.job_em_execucao = None
+        self.agora = 0
 
     def reserva(self, job, prioridade):
         if self.busy:

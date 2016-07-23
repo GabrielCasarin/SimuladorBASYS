@@ -1,7 +1,6 @@
 from PSE.SO import Mensagem
 
 class Impressora(object):
-    """docstring for Impressora"""
     def __init__(self, label, T_impressao):
         super(Impressora, self).__init__()
         self.T_impressao = T_impressao
@@ -9,6 +8,7 @@ class Impressora(object):
         self.busy = False
         self.processo_atual = None
         self.fila = list()
+        self.agora = 0
 
     def requisita(self, job_requisitante):
         if not self.busy:

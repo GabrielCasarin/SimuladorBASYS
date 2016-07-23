@@ -20,6 +20,7 @@ class Disco(object):
         self.processo_atual = None
         self.fila = []
         self.fila_dos_que_esperam_particao_livre = []
+        self.agora = 0
 
     def abrir(self, nome, job_requisitante):
         try:

@@ -10,6 +10,7 @@ class Memoria(object):
         self.T_relocacao = T_relocacao
         self.segmentos = dict()
         self.fila = ListaPrioritaria()
+        self.agora = 0
 
     def requisitar(self, nome, tamamanhoSegmento, job, tempoAtual):
         # verificam se o segmento ja foi alocado ao job

@@ -9,6 +9,7 @@ class Leitora(object):
         self.busy = False
         self.processo_atual = None
         self.fila = list()
+        self.agora = 0
 
     def requisita(self, job_requisitante):
         if not self.busy:
