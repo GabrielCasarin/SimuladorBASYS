@@ -42,11 +42,14 @@ def main():
 
           jobs.append(novo_job)
 
-    mac = Maquina(T_acionamento_clk, T_final, arquivos_conf_dict=arquivos_conf_dict,**parametros)#, jobs=jobs)
+    mac = Maquina(T_acionamento_clk, T_final, arquivos_conf_dict=arquivos_conf_dict,**parametros)
     sim = Simulador(mac)
+
     for job in jobs:
       eventoChegadaJob = Evento('<Iniciar>', job.T_chegada, job)
       sim.addTask(eventoChegadaJob, 1, eventoChegadaJob.T_ocorrencia)
+
+    ## Roda a simulacao
     sim.simulate()
 
     print('\n')

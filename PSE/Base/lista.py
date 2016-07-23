@@ -23,3 +23,6 @@ class ListaPrioritaria:
 
     def __len__(self):
         return len(self.pq)
+
+    def __bool__(self):
+        return bool(self.pq)

@@ -61,6 +61,7 @@ class Job(object):
         ## Tempo de espera em fila
         self.tempo_espera_CPU = 0
         self.tempo_espera_Memoria = 0
+        self.tempo_espera_Disco = 0
         self.tempo_espera_Impressoras = 0
         self.tempo_espera_Leitoras = 0
 
@@ -96,6 +97,7 @@ class Job(object):
                 print('\t    ', evento[0])
         print('\tTempo de espera em fila de CPU:', self.tempo_espera_CPU)
         print('\tTempo de espera em fila de Memoria:', self.tempo_espera_Memoria)
+        print('\tTempo de espera em fila de Disco:', self.tempo_espera_Disco)
         print('\tTempo de espera em fila de Impressoras:', self.tempo_espera_Impressoras)
         print('\tTempo de espera em fila de Leitoras:', self.tempo_espera_Leitoras)
 

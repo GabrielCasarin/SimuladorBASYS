@@ -67,6 +67,7 @@ class Maquina(MaquinaBase):
                 self.AbrirArquivo(evento.job, nome_arquivo=evento.recurso)
 
             elif evento.tipo == '<AcessarArquivo>':
+                print(evento)
                 self.AcessarArquivo(evento.job, nome_arquivo=evento.recurso)
 
             elif evento.tipo == '<LiberarDisco>':
@@ -263,15 +264,18 @@ class Maquina(MaquinaBase):
                 eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.agora)
                 self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
 
-
     def LiberarDisco(self, job):
         try:
             self.disco.libera()
         except Mensagem as e:
             if e.msg == 'job desempilhado':
-                eventoRequisicaoDisco = Evento('<AcessarArquivo>', self.agora, job=e.value)
+                task, tempoEntradaFila = e.value
+                job_requisitante, nome_arquivo = task
+                # atualiza a estatistica do job
+                job_requisitante.tempo_espera_Disco += self.agora - tempoEntradaFila
+                eventoRequisicaoDisco = Evento('<AcessarArquivo>', self.agora, job=job_requisitante, recurso=nome_arquivo)
                 self.simulador.addTask(eventoRequisicaoDisco, 1, eventoRequisicaoDisco.T_ocorrencia)
-                print("{0}\t<LiberarDisco>:\n\tOperacao de E/S do job '{1}' terminada. Job {2} saiu da fila\n".format(self.agora, job.nome, e.value.nome))
+                print("{0}\t<LiberarDisco>:\n\tOperacao de E/S do job '{1}' terminada. Job {2} saiu da fila\n".format(self.agora, job.nome, job_requisitante.nome))
             elif e.msg == 'disco livre':
                 print("{0}\t<LiberarDisco>:\n\tOperacao de E/S do job '{1}' terminada\n".format(self.agora, job.nome))
 
@@ -305,7 +309,7 @@ class Maquina(MaquinaBase):
                             self.simulador.addTask(eventoLiberaCPU, 1, eventoLiberaCPU.T_ocorrencia)
                     elif e.msg == 'evento solicitado':
                         evento, delta = e.value
-                        eventoNovo = Evento(evento.tipo, self.agora + delta, job, evento.recurso)
+                        eventoNovo = Evento(evento.tipo, self.agora + delta, evento.job, evento.recurso)
                         self.simulador.addTask(eventoNovo, 1, eventoNovo.T_ocorrencia)
 
             elif e.msg == 'inserido na fila da CPU':
@@ -430,7 +434,6 @@ class Maquina(MaquinaBase):
         # leitoras
         self.leitora1.agora = tempoAtual
         self.leitora2.agora = tempoAtual
-
 
     def fim(self, task):
         if task.tipo == '<EncerrarSimulacao>':

@@ -1,5 +1,6 @@
 import os
 import itertools
+from PSE.Base import ListaPrioritaria
 from PSE.SO import Mensagem
 
 class Disco(object):
@@ -18,8 +19,8 @@ class Disco(object):
 
         self.busy = False
         self.processo_atual = None
-        self.fila = []
-        self.fila_dos_que_esperam_particao_livre = []
+        self.fila = ListaPrioritaria()
+        self.fila_dos_que_esperam_particao_livre = ListaPrioritaria()
         self.agora = 0
 
     def abrir(self, nome, job_requisitante):
@@ -76,7 +77,7 @@ class Disco(object):
                         arquivo.abrir(job_requisitante)
                         raise Mensagem("arquivo aberto com sucesso", arquivo)
                     else:
-                        self.fila_dos_que_esperam_particao_livre.insert(0, job_requisitante)
+                        self.fila_dos_que_esperam_particao_livre.push((job_requisitante, nome), 1, self.agora)
                         raise("inserido na fila dos que esperam particao livre")
 
         # manda mensagem de erro de falta de permissao
@@ -106,7 +107,7 @@ class Disco(object):
                 self.busy = True
                 raise Mensagem('alocado com sucesso')
             else:
-                self.fila.insert(0, job_requisitante)
+                self.fila.push((job_requisitante, nome_arquivo), 1, self.agora)
                 raise Mensagem('disco ocupado')
         else:
             raise Mensagem('acesso negado')
@@ -165,7 +166,7 @@ class Disco(object):
             tamanho = arquivo.tamanho
             proprietario = arquivo.proprietario
             controle = arquivo.controle
-            usufrutario = arquivo._job_usufrutario.nome
+            usufrutario = arquivo._job_usufrutario.nome if arquivo._job_usufrutario is not None else '(fechado)'
             print("\t| {Particao:^8} | {Nome:12} | {Proprietario:12} | {Usufrutario:10} | {Tamanho:<7} | {Acesso:7} |".format(Particao=i, Nome=nome, Proprietario=proprietario, Usufrutario=usufrutario, Tamanho=tamanho, Acesso=controle))
             i += 1
         print("\t|-------------------------------------------------------------------------|")
