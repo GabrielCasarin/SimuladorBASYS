@@ -1,3 +1,4 @@
+from PSE.Base import ListaPrioritaria
 from PSE.SO import Mensagem
 
 class Impressora(object):
@@ -7,7 +8,7 @@ class Impressora(object):
         self.label = label
         self.busy = False
         self.processo_atual = None
-        self.fila = list()
+        self.fila = ListaPrioritaria()
         self.agora = 0
 
     def requisita(self, job_requisitante):
@@ -16,7 +17,7 @@ class Impressora(object):
             self.busy = True
             raise Mensagem('alocado com sucesso')
         else:
-            self.fila.insert(0, job_requisitante)
+            self.fila.push(job_requisitante, 1, self.agora)
             raise Mensagem('impressora ocupada')
 
     def libera(self):

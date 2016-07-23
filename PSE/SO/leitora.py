@@ -1,3 +1,4 @@
+from PSE.Base import ListaPrioritaria
 from PSE.SO import Mensagem
 
 class Leitora(object):
@@ -8,7 +9,7 @@ class Leitora(object):
         self.T_leitura = T_leitura
         self.busy = False
         self.processo_atual = None
-        self.fila = list()
+        self.fila = ListaPrioritaria()
         self.agora = 0
 
     def requisita(self, job_requisitante):
@@ -17,13 +18,13 @@ class Leitora(object):
             self.busy = True
             raise Mensagem('alocado com sucesso')
         else:
-            self.fila.insert(0, job_requisitante)
+            self.fila.push(job_requisitante, 1, self.agora)
             raise Mensagem('leitora ocupada')
 
     def libera(self):
         self.busy = False
         self.processo_atual = None
-        if len(self.fila) > 0:
+        if self.fila:
             raise Mensagem('job desempilhado', self.fila.pop())
         else:
             raise Mensagem('leitora livre')

@@ -26,3 +26,6 @@ class ListaPrioritaria:
 
     def __bool__(self):
         return bool(self.pq)
+
+    def __contains__(self, item):
+        return item in self.pq

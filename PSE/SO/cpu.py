@@ -7,14 +7,14 @@ class CPU(object):
         super(CPU, self).__init__()
         self.timeSlice = timeSlice
         self.busy = False
-        self.fila = list()
+        self.fila = ListaPrioritaria()
         self.job_em_execucao = None
         self.agora = 0
 
     def reserva(self, job, prioridade):
         if self.busy:
             if job not in self.fila:
-                self.fila.insert(0, job)
+                self.fila.push(job, 1, self.agora)
             raise Mensagem('inserido na fila da CPU')
         else:
             self.job_em_execucao = job
@@ -24,7 +24,7 @@ class CPU(object):
     def libera(self):
         self.busy = False
         self.job_em_execucao = None
-        if len(self.fila) > 0:
+        if self.fila:
             raise Mensagem('job desempilhado', self.fila.pop())
         else:
             raise Mensagem('CPU livre')

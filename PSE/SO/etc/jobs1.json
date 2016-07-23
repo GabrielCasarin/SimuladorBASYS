@@ -9,20 +9,20 @@
       "segmentos": [
         ["a",100],["b",200],["c",300]
       ],
-      "arquivos": ["arq1"],
-      "IO": 2,
+      "arquivos": [],
+      "IO": 0,
       "P": 0,
       "R": 0
     },
     {
       "nome": "J1",
-      "Ti": 200,
+      "Ti": 100,
       "Tmax": 200,
       "segmentos": [
         ["a",100],["b",200],["c",300]
       ],
-      "arquivos": ["arq2"],
-      "IO": 4,
+      "arquivos": [],
+      "IO": 0,
       "P": 0,
       "R": 0
     }
