@@ -87,17 +87,16 @@ class Maquina(MaquinaBase):
                 self.EncerrarSimulacao()
 
     #### Rotinas de tratamento de INTERRUPCOES ####
-
     ## ---------------- ROTINAS DO JOB --------------- ##
     def Iniciar(self, novo_job):
         # seguindo o modelo de estados proposto no enunciado, todo job ao chegar no sistema entra no estado de 'chegada'
-        novo_job.atualizar_status('chegada')
+        novo_job.atualizarStatus('chegada')
         # insere o job na tabela de jobs ativos
         self.job_table.append(novo_job)
         # agenda uma requisição de memória
         eventoRequisicaoMem = Evento('<RequisitarMemoria>', novo_job.T_chegada, novo_job)
         self.simulador.addTask(eventoRequisicaoMem, 1, novo_job.T_chegada)
-        novo_job.atualizar_status('aguardando memoria')
+        novo_job.atualizarStatus('aguardando memoria')
         print('{0}\t<Iniciar>:\n\tjob {1} inserido na tabela\n'.format(self.simulador._agora, novo_job.nome))
 
     def FinalizarJob(self, job):
@@ -105,7 +104,7 @@ class Maquina(MaquinaBase):
         try:
             self.CPU.libera()
         except Mensagem as e:
-            job.atualizar_status('completo')
+            job.atualizarStatus('completo')
             print('{0}\t<FinalizarJob>:\n\tjob {1} concluiu-se\n'.format(self.simulador._agora, job.nome))
             if e.msg == 'job desempilhado':
                 print('\tjob {0} foi desempilhado da fila da CPU\n'.format(job.nome))
@@ -141,7 +140,8 @@ class Maquina(MaquinaBase):
                     print("\tarquivo {0} foi fechado com sucesso pelo job '{1}'. Job {2} saiu da fila\n".format(arquivo.nome, job.nome, e.value.nome))
                     eventoRequisicaoArquivo = Evento('<AbrirArquivo>', self.simulador._agora, job=e.value, recurso=arquivo.nome)
                     self.simulador.addTask(eventoRequisicaoArquivo, 1, eventoRequisicaoArquivo.T_ocorrencia)
-
+        print('\tTabela de Particoes do Disco')
+        self.disco.log_tabelaParticoes()
 
     def EncerrarSimulacao(self):
         print('{0}\t<EncerrarSimulacao>:\n\tSimulacao acabou-se\n'.format(self.simulador._agora))
@@ -160,13 +160,13 @@ class Maquina(MaquinaBase):
                         eventoRequisicaoArquivo = Evento('<AbrirArquivo>', T_ocorrencia + self.memoria.T_relocacao, job, recurso=arquivo)
                         self.simulador.addTask(eventoRequisicaoArquivo, 1, eventoRequisicaoArquivo.T_ocorrencia)
                     # atualiza o status do job para 'aguardando arquivo'
-                    job.atualizar_status('espera arquivos')
+                    job.atualizarStatus('espera arquivos')
                 # caso o job não faça acesso a arquivo, passa direto para requisição de CPU
                 else:
                     eventoRequisicaoCPU = Evento('<RequisitarCPU>', T_ocorrencia + self.memoria.T_relocacao, job)
                     self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoArquivo.T_ocorrencia)
                     # atualiza o status do job para 'pronto' nesse caso
-                    job.atualizar_status('pronto')
+                    job.atualizarStatus('pronto')
 
                 if e.msg == 'alocado com sucesso':
                     job.segmentos_ativos.add(nome_seg)
@@ -191,7 +191,7 @@ class Maquina(MaquinaBase):
                 print('{0}\t<LiberarMemoria>:\n\tjob {1} liberou o segmento \'{2}\'\n'.format(self.simulador._agora, job.nome, nome_seg))
             elif e.msg == 'segmento nao encontrado':
                 print('{0}\t<LiberarMemoria>:\n\tfalta de segmento (job {1})\n'.format(self.simulador._agora, job.nome))
-            job.atualizar_status('pronto')
+            job.atualizarStatus('pronto')
     ## ---------------- FIM MEMORIA CM ---------------- ##
 
     ## ---------------- ARQUIVO ---------------- ##
@@ -203,6 +203,9 @@ class Maquina(MaquinaBase):
         except Mensagem as e:
             if e.msg == "arquivo nao especificado":
                 print("{0}\t<AbrirArquivo>:\n\tjob {1} tentou abrir arquivo '{2}' nao especificado\n".format(self.simulador._agora, job.nome, nome_arquivo))
+                job.atualizarStatus('erro')
+                eventoFinalizaJob = Evento('<FinalizarJob>', agora, job)
+                self.simulador.addTask(eventoFinalizaJob, 1, eventoFinalizaJob.T_ocorrencia)
 
             elif e.msg == "inserido na fila do arquivo":
                 print("{0}\t<AbrirArquivo>:\n\tjob {1} entrou na fila do arquivo {2}\n".format(self.simulador._agora, job.nome, nome_arquivo))
@@ -222,13 +225,18 @@ class Maquina(MaquinaBase):
             elif e.msg == "inserido na fila dos que esperam particao livre":
                 print("{0}\t<AbrirArquivo>:\n\tjob {1} nao conseguiu abrir o arquivo '{2}'. Job inserido na fila dos que esperam por liberacao de particao.\n".format(self.simulador._agora, job.nome, nome_arquivo))
 
-            elif e.msg == "acesso nao permitido":
+            elif e.msg == "acesso negado":
                 print("{0}\t<AbrirArquivo>:\n\tjob {1} nao tem permissao para acessar o arquivo {2}\n".format(self.simulador._agora, job.nome, nome_arquivo))
+                job.atualizarStatus('erro')
+                eventoFinalizaJob = Evento('<FinalizarJob>', agora, job)
+                self.simulador.addTask(eventoFinalizaJob, 1, eventoFinalizaJob.T_ocorrencia)
 
+            print('\tTabela de Particoes do Disco')
+            self.disco.log_tabelaParticoes()
 
     def AcessarArquivo(self, job, nome_arquivo):
         agora = self.simulador._agora
-        job.atualizar_status('espera e/s')
+        job.atualizarStatus('espera e/s')
 
         # libera CPU "na marra"
         try:
@@ -239,15 +247,21 @@ class Maquina(MaquinaBase):
                 self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
 
         try:
-            self.disco.requisita(job)
+            self.disco.requisita(job, nome_arquivo)
         except Mensagem as e:
             if e.msg == 'alocado com sucesso':
-                print('{0}\t<AcessarArquivo>:\n\tjob {1} iniciou operacao de E/S (tempo de CPU transcorrido = {2})\n'.format(self.simulador._agora, job.nome, job.tempo_transcorrido))
+                print("{0}\t<AcessarArquivo>:\n\tjob '{1}' iniciou operacao de E/S no arquivo '{3}' (tempo de CPU transcorrido = {2})\n".format(self.simulador._agora, job.nome, job.tempo_transcorrido, nome_arquivo))
                 # agenda a liberacao do disco
                 eventoLiberaDisco = Evento('<LiberarDisco>', agora + self.disco.T_leitura + self.disco.T_escrita, job)
                 self.simulador.addTask(eventoLiberaDisco, 1, eventoLiberaDisco.T_ocorrencia)
             elif e.msg == 'disco ocupado':
-                print('{0}\t<AcessarArquivo>:\n\tjob {1} entrou na fila de E/S do disco\n'.format(self.simulador._agora, job.nome))
+                print("{0}\t<AcessarArquivo>:\n\tjob '{1}' entrou na fila de E/S do disco\n".format(self.simulador._agora, job.nome))
+            elif e.msg == 'acesso negado':
+                print("{0}\t<AcessarArquivo>:\n\tjob '{1}' teve acesso negado ao arquivo '{2}'\n".format(self.simulador._agora, job.nome, nome_arquivo))
+                job.atualizarStatus('pronto')
+                eventoRequisicaoCPU = Evento('<RequisitarCPU>', agora)
+                self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
+
 
     def LiberarDisco(self, job):
         try:
@@ -263,8 +277,6 @@ class Maquina(MaquinaBase):
             # em ambos os casos, o job liberado entra no round robin novamente
             eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.simulador._agora, job=job)
             self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
-            # if job not in self.CPU.fila:
-            #     self.CPU.fila.insert(0, job)
 
     ## ---------------- ESCALONAMENTO CPU ---------------- ##
     def RequisitarCPU(self, job):
@@ -273,7 +285,7 @@ class Maquina(MaquinaBase):
             self.CPU.reserva(job, 1)
         except Mensagem as e:
             if e.msg == 'alocado com sucesso':
-                job.atualizar_status('em execucao')
+                job.atualizarStatus('em execucao')
                 timeSlice = self.CPU.timeSlice
                 if job.tempo_transcorrido + timeSlice >= job.T_MaxCPU:
                     delta = job.T_MaxCPU - job.tempo_transcorrido
@@ -307,7 +319,7 @@ class Maquina(MaquinaBase):
                 self.CPU.fila.insert(0, job_antigo)
             self.CPU.libera()
         except Mensagem as e:
-            job.atualizar_status('pronto')
+            job.atualizarStatus('pronto')
             print('{0}\t<LiberarCPU>:\n\tjob {1} liberou CPU (tempo trascorrido = {2})\n'.format(self.simulador._agora, job.nome, job.tempo_transcorrido))
             if e.msg == 'job desempilhado':
                 eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.simulador._agora, job=e.value)
@@ -321,7 +333,7 @@ class Maquina(MaquinaBase):
     def Imprimir(self, job, impressora):
         agora = self.simulador._agora
         impressora = self.impressorasID[impressora]
-        job.atualizar_status('espera e/s')
+        job.atualizarStatus('espera e/s')
 
         # libera CPU "na marra"
         try:
@@ -355,15 +367,14 @@ class Maquina(MaquinaBase):
             # em ambos os casos, o job liberado entra no round robin novamente
             eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.simulador._agora, job=job)
             self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
-            # if job not in self.CPU.fila:
-            #     self.CPU.fila.insert(0, job)
+
     ## ---------------- FIM IMPRESSORA ---------------- ##
 
     ## ---------------- LEITORA ---------------- ##
     def Leitura(self, job, leitora):
         agora = self.simulador._agora
         leitora = self.leitorasID[leitora]
-        job.atualizar_status('espera e/s')
+        job.atualizarStatus('espera e/s')
 
         # libera CPU "na marra"
         try:
@@ -397,9 +408,9 @@ class Maquina(MaquinaBase):
             # em ambos os casos, o job liberado entra no round robin novamente
             eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.simulador._agora, job=job)
             self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
-            # if job not in self.CPU.fila:
-            #     self.CPU.fila.insert(0, job)
+
     ## ---------------- FIM LEITORA ---------------- ##
+    #### FIM Rotinas de tratamento de INTERRUPCOES ####
 
     ## Demais rotinas
     def setSimulator(self, simulador):

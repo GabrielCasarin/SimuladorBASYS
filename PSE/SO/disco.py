@@ -42,7 +42,7 @@ class Disco(object):
 
                 # verifica se o arquivo nao se encontra aberto por outro job
                 if not arquivo.aberto:
-                    arquivo.aberto = True
+                    arquivo.abrir(job_requisitante)
                     raise Mensagem("arquivo aberto com sucesso", arquivo)
                 # senao, coloca o job na fila de espera
                 else:
@@ -59,15 +59,20 @@ class Disco(object):
                     arquivo = Arquivo(nome, tamanho, proprietario, controle)
                     pos = self.criarParticao(tamanho)
                     self.alocarParticao(pos, arquivo)
-                    arquivo.aberto = True
+                    arquivo.abrir(job_requisitante)
                     raise Mensagem("arquivo aberto com sucesso", arquivo)
                 else:
                     # busca uma particao livre
                     particao_boa = self.buscaParticaoBoa(tamanho)
                     if particao_boa is not None:
+                        # libera a particao para que o novo arquivo possa ocupa-la
                         self.liberarParticao(particao_boa)
+                        # cria o arquivo
                         arquivo = Arquivo(nome, tamanho, proprietario, controle)
+                        # coloca-o na particao encontrada
                         self.alocarParticao(particao_boa, arquivo)
+                        # e abre o arquivo, dando acesso a ele para o job requisitante
+                        arquivo.abrir(job_requisitante)
                         raise Mensagem("arquivo aberto com sucesso", arquivo)
                     else:
                         self.fila_dos_que_esperam_particao_livre.insert(0, job_requisitante)
@@ -75,13 +80,13 @@ class Disco(object):
 
         # manda mensagem de erro de falta de permissao
         else:
-            raise Mensagem("acesso nao permitido")
+            raise Mensagem("acesso negado")
 
     def fechar(self, nome):
         if nome in self.SFD:
             part = self.SFD[nome]
             _, arquivo = self.particoes[part]
-            arquivo.aberto = False
+            arquivo.fechar()
             if not arquivo.fila:
                 raise Mensagem("arquivo fechado com sucesso")
             else:
@@ -89,14 +94,21 @@ class Disco(object):
         else:
             raise Mensagem('arquivo nao esta aberto')
 
-    def requisita(self, job_requisitante):
-        if not self.busy:
-            self.processo_atual = job_requisitante
-            self.busy = True
-            raise Mensagem('alocado com sucesso')
+    def requisita(self, job_requisitante, nome_arquivo):
+        # verifica se o job requisitante tem acesso ao arquivo
+        particao_num = self.SFD[nome_arquivo]
+        _, arquivo = self.particoes[particao_num]
+        if arquivo._job_usufrutario == job_requisitante:
+            # verifica se o disco em si nao esta ocupado
+            if not self.busy:
+                self.processo_atual = job_requisitante
+                self.busy = True
+                raise Mensagem('alocado com sucesso')
+            else:
+                self.fila.insert(0, job_requisitante)
+                raise Mensagem('disco ocupado')
         else:
-            self.fila.insert(0, job_requisitante)
-            raise Mensagem('disco ocupado')
+            raise Mensagem('acesso negado')
 
     def libera(self):
         self.busy = False
@@ -142,9 +154,9 @@ class Disco(object):
         return None
 
     def log_tabelaParticoes(self):
-        print("\t--------------------------------------------------------------")
-        print("\t| Particao |     Nome     | Proprietario | Tamanho | Acesso  |")
-        print("\t|----------|--------------|--------------|---------|---------|")
+        print("\t---------------------------------------------------------------------------")
+        print("\t| Particao |     Nome     | Proprietario | Aberto por | Tamanho | Acesso  |")
+        print("\t|----------|--------------|--------------|------------|---------|---------|")
         i = 0
         while i < len(self.particoes):
             _, arquivo = self.particoes[i]
@@ -152,12 +164,13 @@ class Disco(object):
             tamanho = arquivo.tamanho
             proprietario = arquivo.proprietario
             controle = arquivo.controle
-            print("\t| {Particao:^8} | {Nome:12} | {Proprietario:12} | {Tamanho:<7} | {Acesso:7} |".format(Particao=i, Nome=nome, Proprietario=proprietario, Tamanho=tamanho, Acesso=controle))
+            usufrutario = arquivo._job_usufrutario.nome
+            print("\t| {Particao:^8} | {Nome:12} | {Proprietario:12} | {Usufrutario:10} | {Tamanho:<7} | {Acesso:7} |".format(Particao=i, Nome=nome, Proprietario=proprietario, Usufrutario=usufrutario, Tamanho=tamanho, Acesso=controle))
             i += 1
-        print("\t|------------------------------------------------------------|")
-        print("\t| Espaco ocupado: {:<42} |".format(self.espaco_ocupado))
-        print("\t| Espaco desalocado: {:<39} |".format(self.espaco_disponivel()))
-        print("\t--------------------------------------------------------------")
+        print("\t|-------------------------------------------------------------------------|")
+        print("\t| Espaco ocupado: {:<55} |".format(self.espaco_ocupado))
+        print("\t| Espaco desalocado: {:<52} |".format(self.espaco_disponivel()))
+        print("\t---------------------------------------------------------------------------")
 
 class Arquivo(object):
     def __init__(self, nome, tamanho, proprietario, controle):
@@ -168,6 +181,15 @@ class Arquivo(object):
         self.conteudo = ''
         self.aberto = False
         self.fila = []
+        self._job_usufrutario = None
+
+    def abrir(self, job):
+        self.aberto = True
+        self._job_usufrutario = job
+
+    def fechar(self):
+        self.aberto = False
+        self._job_usufrutario = None
 
     def ler(self):
         return self.conteudo

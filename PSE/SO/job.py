@@ -65,7 +65,7 @@ class Job(object):
         self.tempo_espera_Leitoras = 0
 
 
-    def atualizar_status(self, novo_status):
+    def atualizarStatus(self, novo_status):
         self.status = novo_status
 
     def _sinc(self, tempo_avanco):
@@ -83,7 +83,7 @@ class Job(object):
         raise Mensagem('time slice completado')
 
     def log_job(self):
-        print('Job:', self.nome)
+        print("Job '{0}': {1}".format(self.nome, self.status))
         print('\tinstante de chegada:', self.T_chegada)
         print('\ttempo maximo de CPU:', self.T_MaxCPU)
         # print('\tsegmentos:', self.segmentos)
