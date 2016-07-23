@@ -1,18 +1,24 @@
-from PSE.SO import Job, Maquina, Evento
-from PSE.Base import Simulador
+import os
 import json
+from PSE.SO import Job
+from PSE.SO import Maquina
+from PSE.SO import Evento
+from PSE.Base import Simulador
+
 
 def main():
+    etc = os.path.join(os.curdir, 'PSE', 'SO', 'etc')
+
     ## Le os parametro globais da simulacao
-    with open('parametros_simulador.json') as conf_sim:
+    with open(os.path.join(etc, 'parametros_simulador.json')) as conf_sim:
         parametros = json.load(conf_sim)
 
-    with open('arquivos.json') as arquivos_conf:
+    with open(os.path.join(etc, 'arquivos.json')) as arquivos_conf:
         arquivos_conf_dict = json.load(arquivos_conf)
 
     # nome_arq_jobs = input('Digite o nome do arquivo de especificacao dos jobs: ')
     nome_arq_jobs = 'jobs1.json'
-    with open(nome_arq_jobs) as arq_jobs:
+    with open(os.path.join(etc, nome_arq_jobs)) as arq_jobs:
       jobs_conf = json.load(arq_jobs)
 
       # determina o tempo de inicio do clock
@@ -50,8 +56,6 @@ def main():
     for job in jobs:
         job.log_job()
         print()
-
-    return sim
 
 if __name__ == '__main__':
     main()
