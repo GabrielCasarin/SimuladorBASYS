@@ -1,12 +1,13 @@
 {
-  "time_slice_size": 20,
+  "time_slice_size": 50,
   "max_processos": 100,
-  "leitora_tempo_leitura": 300,
   "disco_tamanho": 80000,
-  "disco_tempo_escrita": 60,
-  "impressora_tempo_impressao": 200,
-  "memoria_tempo_relocacao": 5,
   "disco_tempo_leitura": 50,
+  "disco_tempo_escrita": 60,
+  "gerenciador_arquivos_tempo_abertura": 10,
+  "memoria_tamanho": 2000,
+  "memoria_tempo_relocacao": 10,
   "memoria_tempo_transferencia": 4,
-  "memoria_tamanho": 2000
+  "impressora_tempo_impressao": 200,
+  "leitora_tempo_leitura": 300
 }

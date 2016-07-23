@@ -14,6 +14,7 @@ class Job(object):
         self.segmentos = segmentos
         self.segmentos_ativos = set()
         self.arquivos = arquivos
+        self.arquivosAbertos = []
         self.DiscoCount = DiscoCount        # qtde de acessos ao disco
         self.LeitoraCount = LeitoraCount    # qtde de leituras de cartao
         self.ImpressoraCount = ImpressoraCount   # qtde de impressoes
@@ -29,7 +30,6 @@ class Job(object):
         times = [int(e) for e in m]
         # embaralha os instantes de interrupcao
         random.shuffle(times)
-        print(times)
 
         ## programa as mudancas de segmento
         # for _ in range(len(self.segmentos)):
@@ -41,17 +41,19 @@ class Job(object):
         ## programa os acessos a arquivo (disco)
         for _ in range(self.DiscoCount):
             eventoAcessoDisco = Evento('<AcessarArquivo>', times.pop(), self, random.choice(self.arquivos))
-            self.eventos_programados.append(eventoAcessoDisco)
+            self.eventos_programados.append([eventoAcessoDisco, False])
 
         ## programa as impressoes
         for _ in range(self.ImpressoraCount):
             eventoImpressao = Evento('<Imprimir>', times.pop(), self, random.choice(['P1', 'P2']))
-            self.eventos_programados.append(eventoImpressao)
+            self.eventos_programados.append([eventoImpressao, False])
 
         ## programa as leituras
         for _ in range(self.LeitoraCount):
             eventoLeitura = Evento('<Leitura>', times.pop(), self, random.choice(['L1', 'L2']))
-            self.eventos_programados.append(eventoLeitura)
+            self.eventos_programados.append([eventoLeitura, False])
+
+        self.eventos_programados_nao_atendidos = list(self.eventos_programados)
 
         # status do job que varia durante o seu curso de vida
         self.status = None
@@ -71,7 +73,7 @@ class Job(object):
 
     def run(self, tempo_avanco):
         last_time = self.tempo_transcorrido
-        for evento in self.eventos_programados:
+        for evento in self.eventos_programados_nao_atendidos:
             if last_time <= evento[0].T_ocorrencia < last_time + tempo_avanco and not evento[1]:
                 evento[1] = True
                 self.tempo_transcorrido = evento[0].T_ocorrencia
@@ -90,8 +92,8 @@ class Job(object):
         print('\tQuantidade de acessos aa Impressora:', self.ImpressoraCount)
         print('\tEventos programados (tempos a partir do inicio da execucao do processo):')
         if len(self.eventos_programados) > 0:
-            for evento in sorted(self.eventos_programados, key = lambda t : t.T_ocorrencia):
-                print('\t    ', evento)
+            for evento in sorted(self.eventos_programados, key = lambda t : t[0].T_ocorrencia):
+                print('\t    ', evento[0])
         print('\tTempo de espera em fila de CPU:', self.tempo_espera_CPU)
         print('\tTempo de espera em fila de Memoria:', self.tempo_espera_Memoria)
         print('\tTempo de espera em fila de Impressoras:', self.tempo_espera_Impressoras)
@@ -100,8 +102,8 @@ class Job(object):
     def prox_segmento(self):
         return random.choice(self.segmentos)
 
-    # def prox_arquivo(self):
-    #     return random.choice(self.arquivos)
+    def todosArquivosAbertos(self):
+        return len(self.arquivosAbertos) == len(self.arquivos)
 
     def __eq__(self, job):
         if isinstance(job, Job):

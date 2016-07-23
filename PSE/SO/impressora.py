@@ -22,7 +22,7 @@ class Impressora(object):
     def libera(self):
         self.busy = False
         self.processo_atual = None
-        if len(self.fila) > 0:
+        if self.fila:
             raise Mensagem('job desempilhado', self.fila.pop())
         else:
             raise Mensagem('impressora livre')

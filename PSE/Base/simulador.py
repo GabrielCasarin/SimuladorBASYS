@@ -3,7 +3,7 @@
 u"""Simulador Estocástico dirigido por Eventos."""
 from PSE.Base.lista import ListaPrioritaria
 from PSE.Base.maquinaBase import MaquinaBase
-
+import itertools
 
 class Simulador(object):
     """simulate a machine according to the McDougall algorithm."""
@@ -14,6 +14,7 @@ class Simulador(object):
         @type machine: Maquina"""
         self._listaEventos = ListaPrioritaria()
         self._agora = 0
+        self.serie = itertools.count()
 
         if isinstance(machine, MaquinaBase):
                 self._Maquina = machine
@@ -21,20 +22,21 @@ class Simulador(object):
 
     def addTask(self, task, priority, time):
         """Add a new task."""
-        achou = False
-        for el in self._listaEventos.pq:
-            if el[0] == priority and el[1] == time:
-                achou = True
-                break
+        # achou = False
+        # for el in self._listaEventos.pq:
+        #     if el[0] == priority and el[1] == time:
+        #         achou = True
+        #         break
 
-        if achou:
-            self._listaEventos.push(task, priority+1, time) # diminui a prioridade de quem chegou depois
-        else:
-            self._listaEventos.push(task, priority, time)
+        # if achou:
+        self._listaEventos.push((next(self.serie), task), priority, time) # diminui a prioridade de quem chegou depois
+        # else:
+        #     self._listaEventos.push(task, priority, time)
 
     def nextTask(self):
         """Remove and return the lowest priority task."""
-        return self._listaEventos.pop()
+        p = self._listaEventos.pop()
+        return p[0][1], p[1]
 
     def simulate(self):
         """Run the simulation."""

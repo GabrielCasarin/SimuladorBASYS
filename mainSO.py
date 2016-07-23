@@ -1,7 +1,6 @@
 from PSE.SO import Job, Maquina, Evento
 from PSE.Base import Simulador
 import json
-# import re
 
 def main():
     ## Le os parametro globais da simulacao
@@ -22,9 +21,8 @@ def main():
       T_final = jobs_conf['T_final_clk']
 
       # carrega todos os jobs que serao simulados
-      jobs = jobs_conf['jobs']
-      for job in jobs:
-
+      jobs = []
+      for job in jobs_conf['jobs']:
           # cria um novo job
           novo_job = Job(nome=job['nome'],      # identificador do job
                         T_chegada=job['Ti'],    # tempo de chegada
@@ -32,27 +30,28 @@ def main():
                         segmentos=job['segmentos'], # estrutura de segmentos do tipo (nome, tamanho)
                         arquivos=job['arquivos'],
                         DiscoCount=job['IO'],              # quantidade de acessos ao disco
-                        ImpressoraCount=job['impressoes'], # quantidade de impressoes
-                        LeitoraCount=job['leituras']       # quantidade de leituras
+                        ImpressoraCount=job['P'], # quantidade de impressoes
+                        LeitoraCount=job['R']       # quantidade de leituras
                      )
-          novo_job.log_job()
 
-    #       jobs.append(novo_job)
+          jobs.append(novo_job)
 
-    # mac = Maquina(T_acionamento_clk, T_final, **parametros)#, jobs=jobs)
-    # sim = Simulador(mac)
-    # for job in jobs:
-    #   eventoChegadaJob = Evento('<Iniciar>', job.T_chegada, job)
-    #   sim.addTask(eventoChegadaJob, 1, eventoChegadaJob.T_ocorrencia)
-    # sim.simulate()
-    #
-    # print('\n')
-    # print('################')
-    # print('#     Jobs     #')
-    # print('################')
-    # for job in jobs:
-    #     job.log_job()
-    #     print()
+    mac = Maquina(T_acionamento_clk, T_final, arquivos_conf_dict=arquivos_conf_dict,**parametros)#, jobs=jobs)
+    sim = Simulador(mac)
+    for job in jobs:
+      eventoChegadaJob = Evento('<Iniciar>', job.T_chegada, job)
+      sim.addTask(eventoChegadaJob, 1, eventoChegadaJob.T_ocorrencia)
+    sim.simulate()
+
+    print('\n')
+    print('################')
+    print('#     Jobs     #')
+    print('################')
+    for job in jobs:
+        job.log_job()
+        print()
+
+    return sim
 
 if __name__ == '__main__':
     main()

@@ -3,19 +3,21 @@ import itertools
 from PSE.SO import Mensagem
 
 class Disco(object):
-    def __init__(self, T_leitura, T_escrita, tamanho, dict_arquivos_conf):
+    def __init__(self, T_leitura, T_escrita, tamanho, arquivos_conf_dict):
         super(Disco, self).__init__()
         self.T_leitura = T_leitura
         self.T_escrita = T_escrita
         self.tamanho = tamanho
         self.espaco_ocupado = 0
 
-        self.dict_arquivos_conf = dict_arquivos_conf
+        self.arquivos_conf_dict = arquivos_conf_dict
 
         self.particoes_cont = itertools.count()
         self.SFD = {} # Symbolic File Directory
         self.particoes = [] # formato da particao: (tamanho, arquivo)
 
+        self.busy = False
+        self.processo_atual = None
         self.fila = []
         self.fila_dos_que_esperam_particao_livre = []
 
@@ -24,7 +26,7 @@ class Disco(object):
             arquivo_dict = next(
                 filter(
                     lambda d : d['nome'] == nome,
-                    self.dict_arquivos_conf
+                    self.arquivos_conf_dict
                 )
             )
         except Exception as e:
@@ -41,7 +43,7 @@ class Disco(object):
                 # verifica se o arquivo nao se encontra aberto por outro job
                 if not arquivo.aberto:
                     arquivo.aberto = True
-                    return arquivo
+                    raise Mensagem("arquivo aberto com sucesso", arquivo)
                 # senao, coloca o job na fila de espera
                 else:
                     arquivo.fila.insert(0, job_requisitante)
@@ -73,7 +75,7 @@ class Disco(object):
 
         # manda mensagem de erro de falta de permissao
         else:
-            raise Mensagem("o job '{}' nao tem direito de acesso ao arquivo '{}'".format(job_requisitante, nome))
+            raise Mensagem("acesso nao permitido")
 
     def fechar(self, nome):
         if nome in self.SFD:
@@ -81,11 +83,28 @@ class Disco(object):
             _, arquivo = self.particoes[part]
             arquivo.aberto = False
             if not arquivo.fila:
-                raise Mensagem("arquivo {} fechado com sucesso".format(nome))
+                raise Mensagem("arquivo fechado com sucesso")
             else:
                 raise Mensagem("job desempilhado", arquivo.fila.pop())
         else:
             raise Mensagem('arquivo nao esta aberto')
+
+    def requisita(self, job_requisitante):
+        if not self.busy:
+            self.processo_atual = job_requisitante
+            self.busy = True
+            raise Mensagem('alocado com sucesso')
+        else:
+            self.fila.insert(0, job_requisitante)
+            raise Mensagem('disco ocupado')
+
+    def libera(self):
+        self.busy = False
+        self.processo_atual = None
+        if self.fila:
+            raise Mensagem('job desempilhado', self.fila.pop())
+        else:
+            raise Mensagem('disco livre')
 
     def espaco_disponivel(self):
         return self.tamanho - self.espaco_ocupado
