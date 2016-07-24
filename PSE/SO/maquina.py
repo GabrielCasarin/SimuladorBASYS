@@ -1,3 +1,21 @@
+# coding=utf-8
+
+# Copyright (c) 2016 Gabriel Casarin da Silva.
+
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 from PSE.Base import MaquinaBase, Simulador, ListaPrioritaria
 from PSE.SO import CPU, Disco, Evento, Impressora, Job, Leitora, Memoria, Mensagem, Segmento
 
@@ -137,7 +155,7 @@ class Maquina(MaquinaBase):
                     print("\tfalta de segmento {2} (job {1})\n".format(self.agora, job.nome, e.value))
 
         # fecha os arquivos
-        if job.arquivosAbertos:            
+        if job.arquivosAbertos:
             for arquivo in job.arquivosAbertos:
                 try:
                     self.disco.fechar(arquivo.nome)
@@ -276,7 +294,6 @@ class Maquina(MaquinaBase):
             if e.msg == 'job desempilhado':
                 task, tempoEntradaFila = e.value
                 job_requisitante, nome_arquivo = task
-                # atualiza a estatistica do job
                 job_requisitante.tempo_espera_Disco += self.agora - tempoEntradaFila
                 eventoRequisicaoDisco = Evento('<AcessarArquivo>', self.agora, job=job_requisitante, recurso=nome_arquivo)
                 self.simulador.addTask(eventoRequisicaoDisco, 1, eventoRequisicaoDisco.T_ocorrencia)
@@ -372,7 +389,9 @@ class Maquina(MaquinaBase):
             impressora.libera()
         except Mensagem as e:
             if e.msg == 'job desempilhado':
-                eventoRequisicaoImpressao('<Imprimir>', self.agora, job=e.value)
+                job_desempilhado, tempoEntradaFila = e.value
+                job_desempilhado.tempo_espera_Impressoras += self.agora - tempoEntradaFila
+                eventoRequisicaoImpressao('<Imprimir>', self.agora, job=job_desempilhado, recurso=impressora.label)
                 self.simulador.addTask(eventoRequisicaoImpressao, 1, eventoRequisicaoImpressao.T_ocorrencia)
                 print('{0}\t<LiberarImpressora>:\n\tImpressora {1} terminou execucao. Job {2} saiu da fila\n'.format(self.agora, impressora.label, e.value.nome))
             elif e.msg == 'impressora livre':
@@ -414,11 +433,13 @@ class Maquina(MaquinaBase):
             leitora.libera()
         except Mensagem as e:
             if e.msg == 'job desempilhado':
-                eventoRequisicaoImpressao('<Imprimir>', self.agora, job=e.value)
-                self.simulador.addTask(eventoRequisicaoImpressao, 1, eventoRequisicaoImpressao.T_ocorrencia)
-                print('{0}\t<LiberarImpressora>:\n\tImpressora {1} terminou execucao. Job {2} saiu da fila\n'.format(self.agora, impressora.label, e.value.nome))
+                job_desempilhado, tempoEntradaFila = e.value
+                job_desempilhado.tempo_espera_Leitoras += self.agora - tempoEntradaFila
+                eventoRequisicaoLeitora('<Leitura>', self.agora, job=job_desempilhado, recurso=leitora.label)
+                self.simulador.addTask(eventoRequisicaoLeitora, 1, eventoRequisicaoLeitora.T_ocorrencia)
+                print('{0}\t<LiberarLeitora>:\n\tLeitora {1} terminou execucao. Job {2} saiu da fila\n'.format(self.agora, leitora.label, job_desempilhado.nome))
             elif e.msg == 'leitora livre':
-                print('{0}\t<LiberarImpressora>:\n\tImpressora {1} terminou execucao\n'.format(self.agora, impressora.label))
+                print('{0}\t<LiberarLeitora>:\n\tLeitora {1} terminou execucao\n'.format(self.agora, leitora.label))
 
             # em ambos os casos, o job liberado entra no round robin novamente
             eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.agora, job=job)
