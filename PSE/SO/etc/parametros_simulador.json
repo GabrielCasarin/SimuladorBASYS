@@ -5,8 +5,8 @@
   "disco_tempo_leitura": 10,
   "disco_tempo_escrita": 15,
   "gerenciador_arquivos_tempo_abertura": 20,
-  "memoria_tamanho": 4000,
-  "memoria_tempo_transferencia": 0.012,
+  "memoria_tamanho": 8000,
+  "memoria_tempo_transferencia": 0.0125,
   "impressora_tempo_impressao": 12000,
   "leitora_tempo_leitura": 15000
 }

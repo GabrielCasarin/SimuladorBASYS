@@ -136,13 +136,15 @@ class Maquina(MaquinaBase):
             self.CPU.libera()
         except Mensagem as e:
             job.atualizarStatus('completo')
-            print('{0:<10}<FinalizarJob>{1:>13}\ttempo maximo de CPU completou-se'.format(self.agora, job.nome))
+            print("{0:<10}<FinalizarJob>{1:>13}\ttempo maximo de CPU completou-se".format(self.agora, job.nome))
             if e.msg == 'job desempilhado':
-                print('\tjob {0} foi desempilhado da fila da CPU'.format(job.nome))
                 job_desempilhado, tempoEntradaFila = e.value
                 job_desempilhado.tempo_espera_CPU += self.agora - tempoEntradaFila
+                print('{1:40}job {0} foi desempilhado da fila da CPU'.format(job_desempilhado.nome, ''))
                 eventoRequisicaoCPU = Evento('<RequisitarCPU>', self.agora, job=job_desempilhado)
                 self.simulador.addTask(eventoRequisicaoCPU, 1, eventoRequisicaoCPU.T_ocorrencia)
+            elif e.msg == 'CPU livre':
+                print("{0:40}a CPU esta livre".format(''))
 
         # libera a memoria
         for seg in list(job.segmentos_ativos):
