@@ -27,7 +27,7 @@ class MaquinaBase(object):
         u"""@ivar:uma referência para o simulador associado à máquina
         @type: Simulador.Simulador """
 
-    def setSimulator(self, simulador):
+    def setSimulador(self, simulador):
         """set a reference of the Simulator caller for the Maquina instance.
         @param simulador: uma referência para o simulador associado à máquina
         @type simulador: Simulador"""

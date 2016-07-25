@@ -34,7 +34,7 @@ class Simulador(object):
 
         if isinstance(machine, MaquinaBase):
                 self._Maquina = machine
-                self._Maquina.setSimulator(self)
+                self._Maquina.setSimulador(self)
 
     def addTask(self, task, priority, time):
         """Add a new task."""

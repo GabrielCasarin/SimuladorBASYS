@@ -18,12 +18,13 @@
 
 
 class Segmento(object):
-    def __init__(self, nome, tamamanhoSegmento, job):
+    def __init__(self, nome, tamamanhoSegmento, job, mae=None):
         super(Segmento, self).__init__()
         # self.disponivel = False
         self.nome = nome
         self.tamamanhoSegmento = tamamanhoSegmento
         self.job = job
+        self.mae = mae
 
     def __str__(self):
         return self.nome

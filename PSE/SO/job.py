@@ -21,7 +21,6 @@ import random
 from PSE.SO import Mensagem, Evento
 
 class Job(object):
-    """docstring for Job"""
     def __init__(self, nome, T_chegada, T_MaxCPU, segmentos, DiscoCount, arquivos, LeitoraCount, ImpressoraCount):
         super(Job, self).__init__()
 
@@ -83,6 +82,7 @@ class Job(object):
         self.tempo_espera_Disco = 0
         self.tempo_espera_Impressoras = 0
         self.tempo_espera_Leitoras = 0
+        self.tempo_total_sistema = 0
 
 
     def atualizarStatus(self, novo_status):
@@ -119,6 +119,7 @@ class Job(object):
         print('\tTempo de espera em fila de Disco:', self.tempo_espera_Disco)
         print('\tTempo de espera em fila de Impressoras:', self.tempo_espera_Impressoras)
         print('\tTempo de espera em fila de Leitoras:', self.tempo_espera_Leitoras)
+        print('\tTEMPO TOTAL NO SISTEMA:', self.tempo_total_sistema)
 
     def prox_segmento(self):
         return random.choice(self.segmentos)

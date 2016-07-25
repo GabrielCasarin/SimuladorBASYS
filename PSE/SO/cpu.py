@@ -21,7 +21,6 @@ from PSE.Base import ListaPrioritaria
 from PSE.SO import Mensagem
 
 class CPU(object):
-    """docstring for CPU"""
     def __init__(self, timeSlice):
         super(CPU, self).__init__()
         self.timeSlice = timeSlice

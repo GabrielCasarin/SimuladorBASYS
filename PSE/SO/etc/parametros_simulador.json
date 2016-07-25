@@ -1,13 +1,12 @@
 {
   "time_slice_size": 50,
   "max_processos": 100,
-  "disco_tamanho": 8000,
-  "disco_tempo_leitura": 50,
-  "disco_tempo_escrita": 60,
-  "gerenciador_arquivos_tempo_abertura": 10,
-  "memoria_tamanho": 2000,
-  "memoria_tempo_relocacao": 10,
-  "memoria_tempo_transferencia": 4,
-  "impressora_tempo_impressao": 200,
-  "leitora_tempo_leitura": 300
+  "disco_tamanho": 80000,
+  "disco_tempo_leitura": 10,
+  "disco_tempo_escrita": 15,
+  "gerenciador_arquivos_tempo_abertura": 20,
+  "memoria_tamanho": 4000,
+  "memoria_tempo_transferencia": 0.012,
+  "impressora_tempo_impressao": 12000,
+  "leitora_tempo_leitura": 15000
 }

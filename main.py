@@ -34,8 +34,8 @@ def main():
     with open(os.path.join(etc, 'arquivos.json')) as arquivos_conf:
         arquivos_conf_dict = json.load(arquivos_conf)
 
-    # nome_arq_jobs = input('Digite o nome do arquivo de especificacao dos jobs: ')
-    nome_arq_jobs = 'jobs1.json'
+    nome_arq_jobs = input('Digite o nome do arquivo de especificacao dos jobs: ') + '.json'
+    # nome_arq_jobs = 'jobs2.json'
     with open(os.path.join(etc, nome_arq_jobs)) as arq_jobs:
       jobs_conf = json.load(arq_jobs)
 
@@ -52,10 +52,10 @@ def main():
                         T_chegada=job['Ti'],    # tempo de chegada
                         T_MaxCPU=job['Tmax'],       # tempo maximo de cpu
                         segmentos=job['segmentos'], # estrutura de segmentos do tipo (nome, tamanho)
-                        arquivos=job['arquivos'],
-                        DiscoCount=job['IO'],              # quantidade de acessos ao disco
-                        ImpressoraCount=job['P'], # quantidade de impressoes
-                        LeitoraCount=job['R']       # quantidade de leituras
+                        arquivos=job['arquivos'],   # lista de arquivos
+                        DiscoCount=job['IO'],   # quantidade de acessos ao disco
+                        ImpressoraCount=job['P'],   # quantidade de impressoes
+                        LeitoraCount=job['R']   # quantidade de leituras
                      )
 
           jobs.append(novo_job)

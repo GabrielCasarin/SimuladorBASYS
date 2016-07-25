@@ -174,10 +174,13 @@ class Disco(object):
 
         return None
 
+    def listarArquivos(self):
+        return [str(arq) for arq in self.SFD.keys]
+
     def log_tabelaParticoes(self):
-        print("\t---------------------------------------------------------------------------")
-        print("\t| Particao |     Nome     | Proprietario | Aberto por | Tamanho | Acesso  |")
-        print("\t|----------|--------------|--------------|------------|---------|---------|")
+        print("{0:40}---------------------------------------------------------------------------".format(''))
+        print("{0:40}| Particao |     Nome     | Proprietario | Aberto por | Tamanho | Acesso  |".format(''))
+        print("{0:40}|----------|--------------|--------------|------------|---------|---------|".format(''))
         i = 0
         while i < len(self.particoes):
             _, arquivo = self.particoes[i]
@@ -186,12 +189,12 @@ class Disco(object):
             proprietario = arquivo.proprietario
             controle = arquivo.controle
             usufrutario = arquivo._job_usufrutario.nome if arquivo._job_usufrutario is not None else '(fechado)'
-            print("\t| {Particao:^8} | {Nome:12} | {Proprietario:12} | {Usufrutario:10} | {Tamanho:<7} | {Acesso:7} |".format(Particao=i, Nome=nome, Proprietario=proprietario, Usufrutario=usufrutario, Tamanho=tamanho, Acesso=controle))
+            print("{0:40}| {Particao:^8} | {Nome:12} | {Proprietario:12} | {Usufrutario:10} | {Tamanho:<7} | {Acesso:7} |".format('',Particao=i, Nome=nome, Proprietario=proprietario, Usufrutario=usufrutario, Tamanho=tamanho, Acesso=controle))
             i += 1
-        print("\t|-------------------------------------------------------------------------|")
-        print("\t| Espaco ocupado: {:<55} |".format(self.espaco_ocupado))
-        print("\t| Espaco desalocado: {:<52} |".format(self.espaco_disponivel()))
-        print("\t---------------------------------------------------------------------------")
+        print("{0:40}|-------------------------------------------------------------------------|".format(''))
+        print("{1:40}| Espaco ocupado:    {0:<52} |".format(self.espaco_ocupado, ''))
+        print("{1:40}| Espaco desalocado: {0:<52} |".format(self.espaco_disponivel(), ''))
+        print("{0:40}---------------------------------------------------------------------------".format(''))
 
 class Arquivo(object):
     def __init__(self, nome, tamanho, proprietario, controle):

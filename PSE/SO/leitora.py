@@ -21,7 +21,6 @@ from PSE.Base import ListaPrioritaria
 from PSE.SO import Mensagem
 
 class Leitora(object):
-    """docstring for Leitora"""
     def __init__(self, label, T_leitura):
         super(Leitora, self).__init__()
         self.label = label
