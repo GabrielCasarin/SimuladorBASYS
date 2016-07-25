@@ -1,0 +1,30 @@
+{
+  "T_acionamento_clk": 0,
+  "T_final_clk": 600000,
+  "jobs": [
+    {
+      "nome": "J0",
+      "Ti": 100,
+      "Tmax": 125,
+      "segmentos": [
+        ["a",4000,""]
+      ],
+      "arquivos": ["arq1"],
+      "IO": 1,
+      "P": 0,
+      "R": 0
+    },
+    {
+      "nome": "J1",
+      "Ti": 105,
+      "Tmax": 100,
+      "segmentos": [
+        ["a",4000,""]
+      ],
+      "arquivos": ["arq2"],
+      "IO": 1,
+      "P": 0,
+      "R": 0
+    }
+  ]
+}

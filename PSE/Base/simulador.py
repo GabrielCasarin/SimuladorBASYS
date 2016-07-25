@@ -38,12 +38,13 @@ class Simulador(object):
 
     def addTask(self, task, priority, time):
         """Add a new task."""
-        self._listaEventos.push((next(self.serie), task), priority, time) # diminui a prioridade de quem chegou depois
+        self._listaEventos.push(task, priority, time, next(self.serie)) # diminui a prioridade de quem chegou depois
 
     def nextTask(self):
         """Remove and return the lowest priority task."""
-        p = self._listaEventos.pop()
-        return p[0][1], p[1]
+        # p = self._listaEventos.pop()
+        # return p[0][1], p[1]
+        return self._listaEventos.pop()
 
     def simulate(self):
         """Run the simulation."""

@@ -37,14 +37,14 @@ class Job(object):
         self.LeitoraCount = LeitoraCount    # qtde de leituras de cartao
         self.ImpressoraCount = ImpressoraCount   # qtde de impressoes
 
-        random.seed(T_MaxCPU + ImpressoraCount + LeitoraCount)
+        random.seed(T_MaxCPU + ImpressoraCount + LeitoraCount + DiscoCount)
         # programa uma serie de eventos
         self.eventos_programados = list()
 
         qtde_eventos = ImpressoraCount + LeitoraCount + DiscoCount#+ len(segmentos)
 
         times = [i*T_MaxCPU/(qtde_eventos + 1) for i in range(1, qtde_eventos + 1)]
-        m = map(lambda e : e + random.gauss(0.0, .065*T_MaxCPU/(qtde_eventos + 1)), times)
+        m = map(lambda e : e + random.gauss(0.0, 0.07*T_MaxCPU/(qtde_eventos + 1)), times)
         times = [int(e) for e in m]
         # embaralha os instantes de interrupcao
         random.shuffle(times)
@@ -110,10 +110,12 @@ class Job(object):
         print('\tQuantidade de acessos ao Disco:', self.DiscoCount)
         print('\tQuantidade de acessos aa Leitora:', self.LeitoraCount)
         print('\tQuantidade de acessos aa Impressora:', self.ImpressoraCount)
-        print('\tEventos programados (tempos a partir do inicio da execucao do processo):')
-        if len(self.eventos_programados) > 0:
+        if self.eventos_programados:
+            print('\tEventos programados (tempos a partir do inicio da execucao do processo):')
             for evento in sorted(self.eventos_programados, key = lambda t : t[0].T_ocorrencia):
                 print('\t    ', evento[0])
+        else:
+            print('\tEventos programados (tempos a partir do inicio da execucao do processo): None')
         print('\tTempo de espera em fila de CPU:', self.tempo_espera_CPU)
         print('\tTempo de espera em fila de Memoria:', self.tempo_espera_Memoria)
         print('\tTempo de espera em fila de Disco:', self.tempo_espera_Disco)

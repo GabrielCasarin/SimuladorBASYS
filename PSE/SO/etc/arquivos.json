@@ -2,13 +2,25 @@
   {
     "nome": "arq1",
     "tamanho": 1000,
-    "proprietario": "J0",
-    "controle": "publico"
+    "proprietario": "J1",
+    "controle": "privado"
   },
   {
     "nome": "arq2",
     "tamanho": 4000,
-    "proprietario": "J1",
+    "proprietario": "J2",
+    "controle": "privado"
+  },
+  {
+    "nome": "arq3",
+    "tamanho": 3500,
+    "proprietario": "J3",
+    "controle": "privado"
+  },
+  {
+    "nome": "arq4",
+    "tamanho": 4500,
+    "proprietario": "J4",
     "controle": "privado"
   }
 ]

@@ -1,7 +1,7 @@
 {
   "time_slice_size": 50,
   "max_processos": 100,
-  "disco_tamanho": 80000,
+  "disco_tamanho": 8000,
   "disco_tempo_leitura": 10,
   "disco_tempo_escrita": 15,
   "gerenciador_arquivos_tempo_abertura": 20,

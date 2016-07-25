@@ -1,0 +1,54 @@
+{
+  "T_acionamento_clk": 0,
+  "T_final_clk": 600000,
+  "jobs": [
+    {
+      "nome": "J1",
+      "Ti": 0,
+      "Tmax": 100,
+      "segmentos": [
+        ["a",4000,""]
+      ],
+      "arquivos": ["arq1"],
+      "IO": 0,
+      "P": 0,
+      "R": 0
+    },
+    {
+      "nome": "J2",
+      "Ti": 100,
+      "Tmax": 100,
+      "segmentos": [
+        ["b",4000,""]
+      ],
+      "arquivos": ["arq2"],
+      "IO": 0,
+      "P": 0,
+      "R": 0
+    },
+    {
+      "nome": "J3",
+      "Ti": 200,
+      "Tmax": 100,
+      "segmentos": [
+        ["c",4000,""]
+      ],
+      "arquivos": ["arq3"],
+      "IO": 0,
+      "P": 0,
+      "R": 0
+    },
+    {
+      "nome": "J4",
+      "Ti": 300,
+      "Tmax": 100,
+      "segmentos": [
+        ["d",4000,""]
+      ],
+      "arquivos": ["arq4"],
+      "IO": 0,
+      "P": 0,
+      "R": 0
+    }
+  ]
+}

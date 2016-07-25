@@ -96,8 +96,8 @@ class Disco(object):
                         arquivo.abrir(job_requisitante)
                         raise Mensagem("arquivo aberto com sucesso", arquivo)
                     else:
-                        self.fila_dos_que_esperam_particao_livre.push((job_requisitante, nome), 1, self.agora)
-                        raise("inserido na fila dos que esperam particao livre")
+                        self.fila_dos_que_esperam_particao_livre.push((job_requisitante, nome, tamanho), 1, self.agora)
+                        raise Mensagem("inserido na fila dos que esperam particao livre")
 
         # manda mensagem de erro de falta de permissao
         else:
@@ -109,6 +109,17 @@ class Disco(object):
             _, arquivo = self.particoes[part]
             arquivo.fechar()
             if not arquivo.fila:
+                # verifica se eh possivel
+                # task, time = self.fila_dos_que_esperam_particao_livre.pop()
+                # job_requisitante, nome_arq, tamanho = task
+                # # busca uma particao livre
+                # particao_boa = self.buscaParticaoBoa(tamanho)
+                # if particao_boa is not None:
+                #     raise("nova requisicao de particao", (job_requisitante, nome_arq))
+                # else:
+                #     self.fila_dos_que_esperam_particao_livre.push((job_requisitante, nome_arq, tamanho), 1, time) # volta pra fila
+                #     raise Mensagem("arquivo fechado com sucesso")
+
                 raise Mensagem("arquivo fechado com sucesso")
             else:
                 raise Mensagem("job desempilhado", arquivo.fila.pop())
@@ -163,8 +174,7 @@ class Disco(object):
 
     def buscaParticaoBoa(self, tamanho):
         i = 0
-        # achou = False
-        while i < len(self.particoes):# and not achou:
+        while i < len(self.particoes):
             tamanho_particao, arquivo = self.particoes[i]
             if not arquivo.aberto and \
                 not arquivo.fila and \
@@ -177,10 +187,20 @@ class Disco(object):
     def listarArquivos(self):
         return [str(arq) for arq in self.SFD.keys]
 
+    def espaco_util(self):
+        i = 0
+        acc = 0
+        while i < len(self.particoes):
+            tamanho_particao, arquivo = self.particoes[i]
+            if arquivo is not None:
+                acc += arquivo.tamanho
+            i += 1
+        return acc
+
     def log_tabelaParticoes(self):
-        print("{0:40}---------------------------------------------------------------------------".format(''))
-        print("{0:40}| Particao |     Nome     | Proprietario | Aberto por | Tamanho | Acesso  |".format(''))
-        print("{0:40}|----------|--------------|--------------|------------|---------|---------|".format(''))
+        print("{0:10}---------------------------------------------------------------------------".format(''))
+        print("{0:10}| Particao |     Nome     | Proprietario | Aberto por | Tamanho | Acesso  |".format(''))
+        print("{0:10}|----------|--------------|--------------|------------|---------|---------|".format(''))
         i = 0
         while i < len(self.particoes):
             _, arquivo = self.particoes[i]
@@ -189,12 +209,13 @@ class Disco(object):
             proprietario = arquivo.proprietario
             controle = arquivo.controle
             usufrutario = arquivo._job_usufrutario.nome if arquivo._job_usufrutario is not None else '(fechado)'
-            print("{0:40}| {Particao:^8} | {Nome:12} | {Proprietario:12} | {Usufrutario:10} | {Tamanho:<7} | {Acesso:7} |".format('',Particao=i, Nome=nome, Proprietario=proprietario, Usufrutario=usufrutario, Tamanho=tamanho, Acesso=controle))
+            print("{0:10}| {Particao:^8} | {Nome:12} | {Proprietario:12} | {Usufrutario:10} | {Tamanho:<7} | {Acesso:7} |".format('',Particao=i, Nome=nome, Proprietario=proprietario, Usufrutario=usufrutario, Tamanho=tamanho, Acesso=controle))
             i += 1
-        print("{0:40}|-------------------------------------------------------------------------|".format(''))
-        print("{1:40}| Espaco ocupado:    {0:<52} |".format(self.espaco_ocupado, ''))
-        print("{1:40}| Espaco desalocado: {0:<52} |".format(self.espaco_disponivel(), ''))
-        print("{0:40}---------------------------------------------------------------------------".format(''))
+        print("{0:10}|-------------------------------------------------------------------------|".format(''))
+        print("{1:10}| Espaco ocupado:    {0:<52} |".format(self.espaco_ocupado, ''))
+        print("{1:10}| Espaco util:       {0:<52} |".format(self.espaco_util(), ''))
+        print("{1:10}| Espaco desalocado: {0:<52} |".format(self.espaco_disponivel(), ''))
+        print("{0:10}---------------------------------------------------------------------------".format(''))
 
 class Arquivo(object):
     def __init__(self, nome, tamanho, proprietario, controle):

@@ -27,13 +27,13 @@ class ListaPrioritaria:
         """constructor."""
         self.pq = []
 
-    def push(self, task, priority, time):
-        entry = [priority, time, task]
+    def push(self, task, priority, time, serie=0):
+        entry = [priority, time, serie, task]
         hp.heappush(self.pq, entry)
 
     def pop(self):
         while self.pq:
-            priority, time, task = hp.heappop(self.pq)
+            priority, time, serie, task = hp.heappop(self.pq)
             return task, time
 
     def __len__(self):
