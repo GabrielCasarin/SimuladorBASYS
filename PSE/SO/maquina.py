@@ -214,7 +214,6 @@ class Maquina(MaquinaBase):
             elif e.msg == 'inserido na fila da memoria':
                 print('{0:<10}<RequisitarMemoria>{1:>8}\tinserido na fila da memoria (memoria livre: {2})'.format(self.agora, job.nome, self.memoria.mem_disponivel))
 
-
     def LiberarMemoria(self, job, nome_seg):
         try:
             self.memoria.liberar(nome_seg)
